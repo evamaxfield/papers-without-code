@@ -20,6 +20,14 @@ papers\_without\_code.example module
    :undoc-members:
    :show-inheritance:
 
+papers\_without\_code.grobid module
+-----------------------------------
+
+.. automodule:: papers_without_code.grobid
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Module contents
 ---------------
 
