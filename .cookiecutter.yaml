@@ -1,0 +1,10 @@
+default_context:
+    author_name: "Eva Maxfield Brown"
+    author_email: "evamaxfieldbrown@gmail.com"
+    hosting_github_username_or_org: "evamaxfield"
+    project_name: "Papers Without Code"
+    project_slug: "papers-without-code"
+    python_slug: "papers_without_code"
+    project_short_description: "A package (and website) to automatically attempt to find the code associated with a paper."
+    hosting_pypi_username: "evamaxfield"
+    license: "MIT License"
