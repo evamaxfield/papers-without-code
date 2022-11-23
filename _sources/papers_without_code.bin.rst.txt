@@ -1,0 +1,21 @@
+papers\_without\_code.bin package
+=================================
+
+Submodules
+----------
+
+papers\_without\_code.bin.str\_len module
+-----------------------------------------
+
+.. automodule:: papers_without_code.bin.str_len
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: papers_without_code.bin
+   :members:
+   :undoc-members:
+   :show-inheritance:

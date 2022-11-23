@@ -1,0 +1,29 @@
+papers\_without\_code package
+=============================
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   papers_without_code.bin
+
+Submodules
+----------
+
+papers\_without\_code.example module
+------------------------------------
+
+.. automodule:: papers_without_code.example
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: papers_without_code
+   :members:
+   :undoc-members:
+   :show-inheritance:
