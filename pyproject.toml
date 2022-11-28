@@ -30,7 +30,6 @@ dependencies = [
   "docker~=6.0",
   "grobid-client-python==0.0.4",
   "keybert~=0.7",
-  "numpy~=1.0",
   "requests~=2.28",
   "xmltodict~=0.13",
 ]
