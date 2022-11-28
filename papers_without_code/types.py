@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, List, Optional, Union
+from typing import TYPE_CHECKING, List, Optional, Tuple, Union
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -28,4 +28,4 @@ class ParseResult:
     authors: List[AuthorDetails]
     abstract: str
     listed_keywords: List[str]
-    bert_keywords: Optional[List[str]]
+    bert_keywords: Optional[List[Tuple[str, float]]]

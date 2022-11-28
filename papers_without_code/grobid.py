@@ -106,7 +106,7 @@ def teardown_server(
 def process_pdf(
     client: GrobidClient,
     pdf_path: PathLike,
-) -> None:
+) -> Dict[str, Any]:
     """
     # TODO
     """
@@ -118,7 +118,7 @@ def process_pdf(
         consolidate_header=True,
         consolidate_citations=False,
         include_raw_citations=False,
-        include_raw_affiliations=False, 
+        include_raw_affiliations=False,
         tei_coordinates=False,
         segment_sentences=False,
     )

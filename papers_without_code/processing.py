@@ -5,7 +5,6 @@ import logging
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
-import numpy as np
 from keybert import KeyBERT
 
 from .grobid import process_pdf, setup_server, teardown_server
@@ -19,17 +18,16 @@ log = logging.getLogger(__name__)
 
 
 def _get_title(data: Dict[str, Any]) -> str:
-    return (
-        data["teiHeader"]["fileDesc"][
-            "sourceDesc"]["biblStruct"]["analytic"]["title"]["#text"]
-    )
+    return data["teiHeader"]["fileDesc"]["sourceDesc"]["biblStruct"]["analytic"][
+        "title"
+    ]["#text"]
 
 
 def _get_authors(data: Dict[str, Any]) -> List[AuthorDetails]:
     authors = []
-    authors_list_data = (
-        data["teiHeader"]["fileDesc"]["sourceDesc"]["biblStruct"]["analytic"]["author"]
-    )
+    authors_list_data = data["teiHeader"]["fileDesc"]["sourceDesc"]["biblStruct"][
+        "analytic"
+    ]["author"]
     for author_data in authors_list_data:
         authors.append(
             AuthorDetails(
@@ -38,7 +36,7 @@ def _get_authors(data: Dict[str, Any]) -> List[AuthorDetails]:
                     author_data["persName"]["surname"],
                 ],
                 email=author_data["email"],
-                affiliation=author_data["affiliation"]["orgName"]["#text"]
+                affiliation=author_data["affiliation"]["orgName"]["#text"],
             )
         )
 
@@ -53,7 +51,7 @@ def _get_keywords_from_authors(data: Dict[str, Any]) -> List[str]:
     return data["teiHeader"]["profileDesc"]["textClass"]["keywords"]["term"]
 
 
-def _get_paper_text(data: Dict[str, Any]) -> List[str]:
+def _get_paper_text(data: Dict[str, Any]) -> str:
     text_segments = []
     for div in data["text"]["body"]["div"]:
         if isinstance(div["p"], str):
@@ -68,7 +66,7 @@ def _get_paper_text(data: Dict[str, Any]) -> List[str]:
     return " ".join(text_segments)
 
 
-def _get_keywords_from_bert(data: Dict[str, Any]) -> Tuple[List[str], np.ndarray]:
+def _get_keywords_from_bert(data: Dict[str, Any]) -> List[Tuple[str, float]]:
     # Get all the text of the paper
     text = _get_paper_text(data)
 
@@ -93,9 +91,7 @@ def parse_pdf(
     pdf_path = Path(pdf_path)
     pdf_path = pdf_path.resolve()
     if not pdf_path.exists():
-        raise FileNotFoundError(
-            f"Provided file does not exist: '{pdf_path}'"
-        )
+        raise FileNotFoundError(f"Provided file does not exist: '{pdf_path}'")
     if pdf_path.is_dir():
         raise IsADirectoryError(
             f"Parsing currently only supports single files. "

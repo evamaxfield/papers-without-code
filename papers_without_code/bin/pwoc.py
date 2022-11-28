@@ -39,7 +39,10 @@ class Args(argparse.Namespace):
 
 
 def _pwoc(pdf_path: Path) -> List[Dict]:
-    return parse_pdf(pdf_path)
+    parse_results = parse_pdf(pdf_path)
+    print(parse_results)
+
+    return []
 
 
 def main() -> None:
@@ -61,8 +64,7 @@ def main() -> None:
 
     # Process
     try:
-        results = _pwoc(args.pdf_path)
-        print(results)
+        _pwoc(args.pdf_path)
     except Exception as e:
         log.error("=============================================")
         log.error("\n\n" + traceback.format_exc())
