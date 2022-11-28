@@ -1,5 +1,5 @@
 Welcome to papers-without-code's documentation!
-======================================
+===============================================
 
 .. toctree::
    :hidden:

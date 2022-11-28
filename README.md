@@ -31,7 +31,7 @@ parse_pdf("path/to/file.pdf")
 ```
 
 ⚠️ Prior to using PWOC you must be logged in to Docker CLI via `docker login`
-because we automatically fetch and spin up and teardown containers for processing. ⚠️
+because we automatically fetch, spin up, and tear down containers for processing. ⚠️
 
 ## Documentation
 
