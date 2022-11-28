@@ -11,3 +11,13 @@ except PackageNotFoundError:
 
 __author__ = "Eva Maxfield Brown"
 __email__ = "evamaxfieldbrown@gmail.com"
+
+
+from .processing import parse_pdf
+
+__all__ = [
+    "__author__",
+    "__email__",
+    "__version__",
+    "parse_pdf",
+]

@@ -5,8 +5,10 @@ import argparse
 import logging
 import sys
 import traceback
+from pathlib import Path
+from typing import Dict, List
 
-from papers_without_code import example
+from papers_without_code import parse_pdf
 
 ###############################################################################
 
@@ -17,13 +19,15 @@ class Args(argparse.Namespace):
 
     def __parse(self) -> None:
         p = argparse.ArgumentParser(
-            prog="calc-string-length",
-            description="Calculate and return the length of the provided string",
+            prog="pwoc",
+            description=(
+                "Papers Without Code: find code repositories for academic papers."
+            ),
         )
         p.add_argument(
-            "string",
-            type=str,
-            help="The string to count the length of.",
+            "pdf_path",
+            type=Path,
+            help="Path to the PDF file to find related repositories for.",
         )
         p.add_argument(
             "--debug",
@@ -32,6 +36,10 @@ class Args(argparse.Namespace):
             help="Run with debug logging.",
         )
         p.parse_args(namespace=self)
+
+
+def _pwoc(pdf_path: Path) -> List[Dict]:
+    return parse_pdf(pdf_path)
 
 
 def main() -> None:
@@ -53,9 +61,8 @@ def main() -> None:
 
     # Process
     try:
-        log.debug(f"Checking string length for string: '{args.string}'")
-        result = example.str_len(string=args.string)
-        log.info(f"The string '{args.string}' has a length of: {result}")
+        results = _pwoc(args.pdf_path)
+        print(results)
     except Exception as e:
         log.error("=============================================")
         log.error("\n\n" + traceback.format_exc())
