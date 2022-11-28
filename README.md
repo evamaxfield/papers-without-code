@@ -14,11 +14,24 @@ A package (and website) to automatically attempt to find the code associated wit
 
 ## Quickstart
 
-```python
-from papers_without_code import example
+From the terminal:
 
-print(example.str_len("hello"))  # prints 5
+```bash
+pip install papers-without-code
+
+pwoc path/to/file.pdf
 ```
+
+Or in Python:
+
+```python
+from papers_without_code import parse_pdf
+
+parse_pdf("path/to/file.pdf")
+```
+
+⚠️ Prior to using PWOC you must be logged in to Docker CLI via `docker login`
+because we automatically fetch and spin up and teardown containers for processing. ⚠️
 
 ## Documentation
 
