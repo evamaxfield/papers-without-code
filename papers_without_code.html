@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="papers_without_code.bin package" href="papers_without_code.bin.html" /><link rel="prev" title="papers_without_code" href="modules.html" />
 
     <meta name="generator" content="sphinx-5.3.0, furo 2022.09.29"/>
-        <title>papers_without_code package - papers-without-code 0.1.dev1+g58755a8 documentation</title>
+        <title>papers_without_code package - papers-without-code 0.1.dev1+g59b30ba documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=d81277517bee4d6b0349d71bb2661d4890b5617c" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
@@ -124,7 +124,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="index.html"><div class="brand">papers-without-code 0.1.dev1+g58755a8 documentation</div></a>
+      <a href="index.html"><div class="brand">papers-without-code 0.1.dev1+g59b30ba documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -147,7 +147,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
   
   
-  <span class="sidebar-brand-text">papers-without-code 0.1.dev1+g58755a8 documentation</span>
+  <span class="sidebar-brand-text">papers-without-code 0.1.dev1+g59b30ba documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="search.html" role="search">
   <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
@@ -209,9 +209,9 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="papers_without_code.bin.html">papers_without_code.bin package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="papers_without_code.bin.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="papers_without_code.bin.html#module-papers_without_code.bin.str_len">papers_without_code.bin.str_len module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="papers_without_code.bin.html#papers_without_code.bin.str_len.Args"><code class="docutils literal notranslate"><span class="pre">Args</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="papers_without_code.bin.html#papers_without_code.bin.str_len.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="papers_without_code.bin.html#module-papers_without_code.bin.pwoc">papers_without_code.bin.pwoc module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="papers_without_code.bin.html#papers_without_code.bin.pwoc.Args"><code class="docutils literal notranslate"><span class="pre">Args</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="papers_without_code.bin.html#papers_without_code.bin.pwoc.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="papers_without_code.bin.html#module-papers_without_code.bin">Module contents</a></li>
@@ -223,45 +223,100 @@
 <section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading">#</a></h2>
 </section>
-<section id="module-papers_without_code.example">
-<span id="papers-without-code-example-module"></span><h2>papers_without_code.example module<a class="headerlink" href="#module-papers_without_code.example" title="Permalink to this heading">#</a></h2>
-<dl class="py function">
-<dt class="sig sig-object py" id="papers_without_code.example.str_len">
-<span class="sig-prename descclassname"><span class="pre">papers_without_code.example.</span></span><span class="sig-name descname"><span class="pre">str_len</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="reference internal" href="_modules/papers_without_code/example.html#str_len"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#papers_without_code.example.str_len" title="Permalink to this definition">#</a></dt>
-<dd><p>Return the count of characters in the provided string.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>string: str</strong></dt><dd><p>The string to get the count of characters for.</p>
-</dd>
-</dl>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><dl class="simple">
-<dt>int</dt><dd><p>The count of characters in the string.</p>
-</dd>
-</dl>
-</dd>
-</dl>
-</dd></dl>
-
-</section>
 <section id="module-papers_without_code.grobid">
 <span id="papers-without-code-grobid-module"></span><h2>papers_without_code.grobid module<a class="headerlink" href="#module-papers_without_code.grobid" title="Permalink to this heading">#</a></h2>
 <dl class="py function">
+<dt class="sig sig-object py" id="papers_without_code.grobid.process_pdf">
+<span class="sig-prename descclassname"><span class="pre">papers_without_code.grobid.</span></span><span class="sig-name descname"><span class="pre">process_pdf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">GrobidClient</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pdf_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Path</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/papers_without_code/grobid.html#process_pdf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#papers_without_code.grobid.process_pdf" title="Permalink to this definition">#</a></dt>
+<dd><p># TODO</p>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="papers_without_code.grobid.setup_server">
-<span class="sig-prename descclassname"><span class="pre">papers_without_code.grobid.</span></span><span class="sig-name descname"><span class="pre">setup_server</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">port</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Container</span></span></span><a class="reference internal" href="_modules/papers_without_code/grobid.html#setup_server"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#papers_without_code.grobid.setup_server" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<span class="sig-prename descclassname"><span class="pre">papers_without_code.grobid.</span></span><span class="sig-name descname"><span class="pre">setup_server</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">port</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grobid_client_kws</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">GrobidClient</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Container</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/papers_without_code/grobid.html#setup_server"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#papers_without_code.grobid.setup_server" title="Permalink to this definition">#</a></dt>
+<dd><p># TODO</p>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="papers_without_code.grobid.teardown_server">
 <span class="sig-prename descclassname"><span class="pre">papers_without_code.grobid.</span></span><span class="sig-name descname"><span class="pre">teardown_server</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">container</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Container</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/papers_without_code/grobid.html#teardown_server"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#papers_without_code.grobid.teardown_server" title="Permalink to this definition">#</a></dt>
+<dd><p># TODO</p>
+</dd></dl>
+
+</section>
+<section id="module-papers_without_code.processing">
+<span id="papers-without-code-processing-module"></span><h2>papers_without_code.processing module<a class="headerlink" href="#module-papers_without_code.processing" title="Permalink to this heading">#</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="papers_without_code.processing.parse_pdf">
+<span class="sig-prename descclassname"><span class="pre">papers_without_code.processing.</span></span><span class="sig-name descname"><span class="pre">parse_pdf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pdf_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Path</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compute_keywords_with_bert</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grobid_server_kws</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#papers_without_code.types.ParseResult" title="papers_without_code.types.ParseResult"><span class="pre">ParseResult</span></a></span></span><a class="reference internal" href="_modules/papers_without_code/processing.html#parse_pdf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#papers_without_code.processing.parse_pdf" title="Permalink to this definition">#</a></dt>
+<dd><p># TODO</p>
+</dd></dl>
+
+</section>
+<section id="module-papers_without_code.types">
+<span id="papers-without-code-types-module"></span><h2>papers_without_code.types module<a class="headerlink" href="#module-papers_without_code.types" title="Permalink to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="papers_without_code.types.AuthorDetails">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">papers_without_code.types.</span></span><span class="sig-name descname"><span class="pre">AuthorDetails</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name_parts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">email</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">affiliation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/papers_without_code/types.html#AuthorDetails"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#papers_without_code.types.AuthorDetails" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="papers_without_code.types.AuthorDetails.affiliation">
+<span class="sig-name descname"><span class="pre">affiliation</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#papers_without_code.types.AuthorDetails.affiliation" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="papers_without_code.types.AuthorDetails.email">
+<span class="sig-name descname"><span class="pre">email</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#papers_without_code.types.AuthorDetails.email" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="papers_without_code.types.AuthorDetails.name_parts">
+<span class="sig-name descname"><span class="pre">name_parts</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#papers_without_code.types.AuthorDetails.name_parts" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="papers_without_code.types.ParseResult">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">papers_without_code.types.</span></span><span class="sig-name descname"><span class="pre">ParseResult</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">authors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#papers_without_code.types.AuthorDetails" title="papers_without_code.types.AuthorDetails"><span class="pre">papers_without_code.types.AuthorDetails</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">abstract</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">listed_keywords</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bert_keywords</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/papers_without_code/types.html#ParseResult"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#papers_without_code.types.ParseResult" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="papers_without_code.types.ParseResult.abstract">
+<span class="sig-name descname"><span class="pre">abstract</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#papers_without_code.types.ParseResult.abstract" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="papers_without_code.types.ParseResult.authors">
+<span class="sig-name descname"><span class="pre">authors</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#papers_without_code.types.AuthorDetails" title="papers_without_code.types.AuthorDetails"><span class="pre">AuthorDetails</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#papers_without_code.types.ParseResult.authors" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="papers_without_code.types.ParseResult.bert_keywords">
+<span class="sig-name descname"><span class="pre">bert_keywords</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#papers_without_code.types.ParseResult.bert_keywords" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="papers_without_code.types.ParseResult.listed_keywords">
+<span class="sig-name descname"><span class="pre">listed_keywords</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#papers_without_code.types.ParseResult.listed_keywords" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="papers_without_code.types.ParseResult.title">
+<span class="sig-name descname"><span class="pre">title</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#papers_without_code.types.ParseResult.title" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
 
 </section>
 <section id="module-papers_without_code">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-papers_without_code" title="Permalink to this heading">#</a></h2>
 <p>Top-level package for papers_without_code.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="papers_without_code.parse_pdf">
+<span class="sig-prename descclassname"><span class="pre">papers_without_code.</span></span><span class="sig-name descname"><span class="pre">parse_pdf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pdf_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Path</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compute_keywords_with_bert</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grobid_server_kws</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#papers_without_code.types.ParseResult" title="papers_without_code.types.ParseResult"><span class="pre">ParseResult</span></a></span></span><a class="reference internal" href="_modules/papers_without_code/processing.html#parse_pdf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#papers_without_code.parse_pdf" title="Permalink to this definition">#</a></dt>
+<dd><p># TODO</p>
+</dd></dl>
+
 </section>
 </section>
 
@@ -325,16 +380,37 @@
 <li><a class="reference internal" href="#">papers_without_code package</a><ul>
 <li><a class="reference internal" href="#subpackages">Subpackages</a></li>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#module-papers_without_code.example">papers_without_code.example module</a><ul>
-<li><a class="reference internal" href="#papers_without_code.example.str_len"><code class="docutils literal notranslate"><span class="pre">str_len()</span></code></a></li>
-</ul>
-</li>
 <li><a class="reference internal" href="#module-papers_without_code.grobid">papers_without_code.grobid module</a><ul>
+<li><a class="reference internal" href="#papers_without_code.grobid.process_pdf"><code class="docutils literal notranslate"><span class="pre">process_pdf()</span></code></a></li>
 <li><a class="reference internal" href="#papers_without_code.grobid.setup_server"><code class="docutils literal notranslate"><span class="pre">setup_server()</span></code></a></li>
 <li><a class="reference internal" href="#papers_without_code.grobid.teardown_server"><code class="docutils literal notranslate"><span class="pre">teardown_server()</span></code></a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#module-papers_without_code">Module contents</a></li>
+<li><a class="reference internal" href="#module-papers_without_code.processing">papers_without_code.processing module</a><ul>
+<li><a class="reference internal" href="#papers_without_code.processing.parse_pdf"><code class="docutils literal notranslate"><span class="pre">parse_pdf()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-papers_without_code.types">papers_without_code.types module</a><ul>
+<li><a class="reference internal" href="#papers_without_code.types.AuthorDetails"><code class="docutils literal notranslate"><span class="pre">AuthorDetails</span></code></a><ul>
+<li><a class="reference internal" href="#papers_without_code.types.AuthorDetails.affiliation"><code class="docutils literal notranslate"><span class="pre">AuthorDetails.affiliation</span></code></a></li>
+<li><a class="reference internal" href="#papers_without_code.types.AuthorDetails.email"><code class="docutils literal notranslate"><span class="pre">AuthorDetails.email</span></code></a></li>
+<li><a class="reference internal" href="#papers_without_code.types.AuthorDetails.name_parts"><code class="docutils literal notranslate"><span class="pre">AuthorDetails.name_parts</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#papers_without_code.types.ParseResult"><code class="docutils literal notranslate"><span class="pre">ParseResult</span></code></a><ul>
+<li><a class="reference internal" href="#papers_without_code.types.ParseResult.abstract"><code class="docutils literal notranslate"><span class="pre">ParseResult.abstract</span></code></a></li>
+<li><a class="reference internal" href="#papers_without_code.types.ParseResult.authors"><code class="docutils literal notranslate"><span class="pre">ParseResult.authors</span></code></a></li>
+<li><a class="reference internal" href="#papers_without_code.types.ParseResult.bert_keywords"><code class="docutils literal notranslate"><span class="pre">ParseResult.bert_keywords</span></code></a></li>
+<li><a class="reference internal" href="#papers_without_code.types.ParseResult.listed_keywords"><code class="docutils literal notranslate"><span class="pre">ParseResult.listed_keywords</span></code></a></li>
+<li><a class="reference internal" href="#papers_without_code.types.ParseResult.title"><code class="docutils literal notranslate"><span class="pre">ParseResult.title</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-papers_without_code">Module contents</a><ul>
+<li><a class="reference internal" href="#papers_without_code.parse_pdf"><code class="docutils literal notranslate"><span class="pre">parse_pdf()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

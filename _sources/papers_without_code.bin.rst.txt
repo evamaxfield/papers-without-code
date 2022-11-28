@@ -4,10 +4,10 @@ papers\_without\_code.bin package
 Submodules
 ----------
 
-papers\_without\_code.bin.str\_len module
------------------------------------------
+papers\_without\_code.bin.pwoc module
+-------------------------------------
 
-.. automodule:: papers_without_code.bin.str_len
+.. automodule:: papers_without_code.bin.pwoc
    :members:
    :undoc-members:
    :show-inheritance:

@@ -12,18 +12,26 @@ Subpackages
 Submodules
 ----------
 
-papers\_without\_code.example module
-------------------------------------
-
-.. automodule:: papers_without_code.example
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 papers\_without\_code.grobid module
 -----------------------------------
 
 .. automodule:: papers_without_code.grobid
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+papers\_without\_code.processing module
+---------------------------------------
+
+.. automodule:: papers_without_code.processing
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+papers\_without\_code.types module
+----------------------------------
+
+.. automodule:: papers_without_code.types
    :members:
    :undoc-members:
    :show-inheritance:
