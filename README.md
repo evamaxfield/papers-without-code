@@ -37,6 +37,8 @@ because we automatically fetch, spin up, and tear down containers for processing
 
 For full package documentation please visit [evamaxfield.github.io/papers-without-code](https://evamaxfield.github.io/papers-without-code).
 
+[Exploratory data analysis of the dataset used for testing](https://evamaxfield.github.io/papers-without-code/eda.html)
+
 ## Development
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for information related to developing the code.
