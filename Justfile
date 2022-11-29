@@ -41,6 +41,7 @@ build:
 generate-docs:
 	rm -f docs/papers_without_code*.rst
 	rm -f docs/modules.rst
+	mkdir -p docs/_build
 	jupyter nbconvert --execute --to html data/eda.ipynb
 	mv data/eda.html docs/_build
 	sphinx-apidoc -o docs papers_without_code **/tests
