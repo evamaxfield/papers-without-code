@@ -28,7 +28,7 @@ DEFAULT_GROBID_PORT = 8070
 def setup_server(
     image: Optional[str] = None,
     port: Optional[int] = None,
-    grobid_client_kws: Dict[str, Any] = {},
+    grobid_client_kws: Dict[str, Any] = {"timeout": 120},
 ) -> Tuple[Optional[GrobidClient], docker.models.containers.Container]:
     """
     # TODO
@@ -69,7 +69,7 @@ def setup_server(
     # Attempt to connect with client
     try:
         log.debug(f"Started GROBID container: '{container.id}'")
-        time.sleep(3)
+        time.sleep(5)
 
         # Make request to check the server is alive
         server_url = f"http://127.0.0.1:{port}"
