@@ -1,0 +1,81 @@
+id,doi,update_date,title,code_repository_linked_in_paper,code_repository_link
+2101.10263,,2021-01-26,"Generative Autoencoder Kernels on Deep Learning for Brain Activity
+  Analysis",,
+2106.09719,,2021-12-03,"Machining Cycle Time Prediction: Data-driven Modelling of Machine Tool
+  Feedrate Behavior with Neural Networks",,
+2107.05962,,2021-07-23,COLiER: Collaborative Editing of Raster Images,,
+2112.08371,10.1007/978-3-030-74009-2,2021-12-17,Blockchain as an IoT intermediary,,
+1803.09565,10.1371/journal.pcbi.1006454,2018-09-13,"SIG-DB: leveraging homomorphic encryption to Securely Interrogate
+  privately held Genomic DataBases",,
+2202.13538,10.14778/3551793.3551831,2022-08-04,"Algorithm and System Co-design for Efficient Subgraph-based Graph
+  Representation Learning",,
+2111.14338,,2021-11-30,Improving Deep Learning Interpretability by Saliency Guided Training,,
+2102.12646,10.1016/j.orl.2021.02.004,2021-05-28,"Spanning Tree Constrained Determinantal Point Processes are Hard to
+  (Approximately) Evaluate",,
+1807.06007,10.2139/ssrn.3229363,2020-02-25,On Lebesgue Integral Quadrature,,
+1706.07119,10.1016/j.neucom.2018.07.071,2019-05-06,"""Parallel Training Considered Harmful?"": Comparing series-parallel and
+  parallel feedforward network training",,
+2003.01479,10.1109/SPAWC48557.2020.9154322,2021-10-22,"End-to-End Fast Training of Communication Links Without a Channel Model
+  via Online Meta-Learning",,
+2110.06912,,2021-10-14,OPEn: An Open-ended Physics Environment for Learning Without a Task,,
+2009.10761,,2022-06-22,"On the Locality of Nash-Williams Forest Decomposition and Star-Forest
+  Decomposition",,
+2205.04892,,2022-10-14,"GRU-TV: Time- and velocity-aware GRU for patient representation on
+  multivariate clinical time-series data",,
+1501.05151,10.1109/MAES.2016.150083,2018-01-01,Recursive Bayesian Filtering in Circular State Spaces,,
+2111.11661,,2021-11-24,"Optimum Noise Mechanism for Differentially Private Queries in Discrete
+  Finite Sets",,
+2007.10100,,2020-07-21,Computing stable resultant-based minimal solvers by hiding a variable,,
+2205.04052,,2022-05-10,"Realization of Lattice Formation in Nonlinear Two-dimensional Potential
+  by Mobile Robots",,
+2105.05438,,2021-05-13,Indoor positioning systems: Smart fusion of a variety of sensor readings,,
+2110.05877,,2021-10-13,"OpenHands: Making Sign Language Recognition Accessible with Pose-based
+  Pretrained Models across Languages",,
+2002.00512,10.1016/j.jcp.2021.110510,2021-07-07,"Variational projector-augmented wave method: a full-potential approach
+  for electronic structure calculations in solid-state physics",,
+2202.06443,10.1109/IV51971.2022.9827031,2022-11-15,"Learning Reward Models for Cooperative Trajectory Planning with Inverse
+  Reinforcement Learning and Monte Carlo Tree Search",,
+2111.12485,,2022-07-25,Understanding the Dynamics of DNNs Using Graph Modularity,,
+1401.7360,10.1109/ALLERTON.2014.7028604,2017-05-25,A Shannon Approach to Secure Multi-party Computations,,
+1909.05665,,2019-10-01,"Cooperation-Aware Lane Change Maneuver in Dense Traffic based on Model
+  Predictive Control with Recurrent Neural Network",,
+1906.02325,,2021-03-15,"Privacy-Preserving Classification of Personal Text Messages with Secure
+  Multi-Party Computation: An Application to Hate-Speech Detection",,
+2012.14098,,2020-12-29,"Risk-Sensitive Deep RL: Variance-Constrained Actor-Critic Provably Finds
+  Globally Optimal Policy",,
+2107.01857,10.1109/TQE.2022.3143997,2022-02-23,"Versatile and concurrent FPGA-based architecture for practical quantum
+  communication systems",,
+2005.11313,,2020-05-25,Comparative Study of Machine Learning Models and BERT on SQuAD,,
+2104.11691,,2021-04-26,"Patch Shortcuts: Interpretable Proxy Models Efficiently Find Black-Box
+  Vulnerabilities",,
+2008.04403,,2020-08-12,"Comparison of Model Predictive and Reinforcement Learning Methods for
+  Fault Tolerant Control",,
+2112.09165,,2021-12-20,"ALEBk: Feasibility Study of Attention Level Estimation via Blink
+  Detection applied to e-Learning",,
+2112.07297,,2021-12-15,Parameterized codes over graphs,,
+2103.14332,,2021-03-30,"Building Reliable Explanations of Unreliable Neural Networks: Locally
+  Smoothing Perspective of Model Interpretation",,
+2206.07760,10.3390/e24081116,2022-10-07,Multiscale methods for signal selection in single-cell data,,
+2205.02596,,2022-05-06,"Natural Language Inference with Self-Attention for Veracity Assessment
+  of Pandemic Claims",,
+1705.05215,10.1109/JSAC.2017.2699085,2018-10-03,Beamspace SU-MIMO for Future Millimeter Wave Wireless Communications,,
+2111.00668,,2021-11-02,Improved Algorithms for Low Rank Approximation from Sparsity,,
+1808.05464,,2019-04-03,"Transfer Learning for Brain-Computer Interfaces: A Euclidean Space Data
+  Alignment Approach",,
+1908.02146,10.1145/3303772.3303786,2019-08-09,Knowledge Query Network: How Knowledge Interacts with Skills,,
+1811.03897,,2018-11-12,"Deep Ensemble Bayesian Active Learning : Addressing the Mode Collapse
+  issue in Monte Carlo dropout via Ensembles",,
+2210.05103,10.1145/3551349.3559564,2022-10-12,Leveraging Artificial Intelligence on Binary Code Comprehension,,
+1708.06238,10.3389/fnins.2018.00210,2018-03-30,"Stochastic IMT (insulator-metal-transition) neurons: An interplay of
+  thermal and threshold noise at bifurcation",,
+1908.00385,10.1109/ACII.2019.8925507,2020-02-05,"Classification of Cognitive Load and Expertise for Adaptive Simulation
+  using Deep Multitask Learning",,
+1910.05395,,2019-11-22,"FuseMODNet: Real-Time Camera and LiDAR based Moving Object Detection for
+  robust low-light Autonomous Driving",,
+1712.03660,,2020-09-15,Parallel Mapper,,
+2105.01004,,2021-05-04,Automatic Collection Creation and Recommendation,,
+2108.12687,,2022-02-22,Visible Rank and Codes with Locality,,
+1807.11125,,2018-09-18,"Microsoft Dialogue Challenge: Building End-to-End Task-Completion
+  Dialogue Systems",,
+2106.00225,,2021-10-28,"Locally Valid and Discriminative Prediction Intervals for Deep Learning
+  Models",,
