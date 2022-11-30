@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="papers_without_code.bin package" href="papers_without_code.bin.html" /><link rel="prev" title="papers_without_code" href="modules.html" />
 
     <meta name="generator" content="sphinx-5.3.0, furo 2022.09.29"/>
-        <title>papers_without_code package - papers-without-code 0.1.dev1+g7da4a32 documentation</title>
+        <title>papers_without_code package - papers-without-code 0.1.dev1+g2508886 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=d81277517bee4d6b0349d71bb2661d4890b5617c" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
@@ -124,7 +124,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="index.html"><div class="brand">papers-without-code 0.1.dev1+g7da4a32 documentation</div></a>
+      <a href="index.html"><div class="brand">papers-without-code 0.1.dev1+g2508886 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -147,7 +147,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
   
   
-  <span class="sidebar-brand-text">papers-without-code 0.1.dev1+g7da4a32 documentation</span>
+  <span class="sidebar-brand-text">papers-without-code 0.1.dev1+g2508886 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="search.html" role="search">
   <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
@@ -214,6 +214,11 @@
 <li class="toctree-l3"><a class="reference internal" href="papers_without_code.bin.html#papers_without_code.bin.pwoc.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="papers_without_code.bin.html#module-papers_without_code.bin.pwoc_server">papers_without_code.bin.pwoc_server module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="papers_without_code.bin.html#papers_without_code.bin.pwoc_server.Args"><code class="docutils literal notranslate"><span class="pre">Args</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="papers_without_code.bin.html#papers_without_code.bin.pwoc_server.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="papers_without_code.bin.html#module-papers_without_code.bin">Module contents</a></li>
 </ul>
 </li>
@@ -232,8 +237,8 @@
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="papers_without_code.grobid.setup_server">
-<span class="sig-prename descclassname"><span class="pre">papers_without_code.grobid.</span></span><span class="sig-name descname"><span class="pre">setup_server</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">port</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grobid_client_kws</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">{'timeout':</span> <span class="pre">120}</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">GrobidClient</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Container</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/papers_without_code/grobid.html#setup_server"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#papers_without_code.grobid.setup_server" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="papers_without_code.grobid.setup_or_connect_to_server">
+<span class="sig-prename descclassname"><span class="pre">papers_without_code.grobid.</span></span><span class="sig-name descname"><span class="pre">setup_or_connect_to_server</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">port</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grobid_client_kws</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">{'timeout':</span> <span class="pre">120}</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">GrobidClient</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Container</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/papers_without_code/grobid.html#setup_or_connect_to_server"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#papers_without_code.grobid.setup_or_connect_to_server" title="Permalink to this definition">#</a></dt>
 <dd><p># TODO</p>
 </dd></dl>
 
@@ -247,8 +252,8 @@
 <section id="module-papers_without_code.processing">
 <span id="papers-without-code-processing-module"></span><h2>papers_without_code.processing module<a class="headerlink" href="#module-papers_without_code.processing" title="Permalink to this heading">#</a></h2>
 <dl class="py function">
-<dt class="sig sig-object py" id="papers_without_code.processing.parse_pdf">
-<span class="sig-prename descclassname"><span class="pre">papers_without_code.processing.</span></span><span class="sig-name descname"><span class="pre">parse_pdf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pdf_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Path</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compute_keywords_with_bert</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grobid_server_kws</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#papers_without_code.types.ParseResult" title="papers_without_code.types.ParseResult"><span class="pre">ParseResult</span></a></span></span><a class="reference internal" href="_modules/papers_without_code/processing.html#parse_pdf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#papers_without_code.processing.parse_pdf" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="papers_without_code.processing.parse_grobid_data">
+<span class="sig-prename descclassname"><span class="pre">papers_without_code.processing.</span></span><span class="sig-name descname"><span class="pre">parse_grobid_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grobid_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compute_keywords_with_bert</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#papers_without_code.types.ParseResult" title="papers_without_code.types.ParseResult"><span class="pre">ParseResult</span></a></span></span><a class="reference internal" href="_modules/papers_without_code/processing.html#parse_grobid_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#papers_without_code.processing.parse_grobid_data" title="Permalink to this definition">#</a></dt>
 <dd><p># TODO</p>
 </dd></dl>
 
@@ -311,12 +316,6 @@
 <section id="module-papers_without_code">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-papers_without_code" title="Permalink to this heading">#</a></h2>
 <p>Top-level package for papers_without_code.</p>
-<dl class="py function">
-<dt class="sig sig-object py" id="papers_without_code.parse_pdf">
-<span class="sig-prename descclassname"><span class="pre">papers_without_code.</span></span><span class="sig-name descname"><span class="pre">parse_pdf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pdf_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Path</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compute_keywords_with_bert</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grobid_server_kws</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#papers_without_code.types.ParseResult" title="papers_without_code.types.ParseResult"><span class="pre">ParseResult</span></a></span></span><a class="reference internal" href="_modules/papers_without_code/processing.html#parse_pdf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#papers_without_code.parse_pdf" title="Permalink to this definition">#</a></dt>
-<dd><p># TODO</p>
-</dd></dl>
-
 </section>
 </section>
 
@@ -382,12 +381,12 @@
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
 <li><a class="reference internal" href="#module-papers_without_code.grobid">papers_without_code.grobid module</a><ul>
 <li><a class="reference internal" href="#papers_without_code.grobid.process_pdf"><code class="docutils literal notranslate"><span class="pre">process_pdf()</span></code></a></li>
-<li><a class="reference internal" href="#papers_without_code.grobid.setup_server"><code class="docutils literal notranslate"><span class="pre">setup_server()</span></code></a></li>
+<li><a class="reference internal" href="#papers_without_code.grobid.setup_or_connect_to_server"><code class="docutils literal notranslate"><span class="pre">setup_or_connect_to_server()</span></code></a></li>
 <li><a class="reference internal" href="#papers_without_code.grobid.teardown_server"><code class="docutils literal notranslate"><span class="pre">teardown_server()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#module-papers_without_code.processing">papers_without_code.processing module</a><ul>
-<li><a class="reference internal" href="#papers_without_code.processing.parse_pdf"><code class="docutils literal notranslate"><span class="pre">parse_pdf()</span></code></a></li>
+<li><a class="reference internal" href="#papers_without_code.processing.parse_grobid_data"><code class="docutils literal notranslate"><span class="pre">parse_grobid_data()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#module-papers_without_code.types">papers_without_code.types module</a><ul>
@@ -407,10 +406,7 @@
 </li>
 </ul>
 </li>
-<li><a class="reference internal" href="#module-papers_without_code">Module contents</a><ul>
-<li><a class="reference internal" href="#papers_without_code.parse_pdf"><code class="docutils literal notranslate"><span class="pre">parse_pdf()</span></code></a></li>
-</ul>
-</li>
+<li><a class="reference internal" href="#module-papers_without_code">Module contents</a></li>
 </ul>
 </li>
 </ul>

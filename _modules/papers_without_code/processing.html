@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" />
 
     <meta name="generator" content="sphinx-5.3.0, furo 2022.09.29"/>
-        <title>papers_without_code.processing - papers-without-code 0.1.dev1+g7da4a32 documentation</title>
+        <title>papers_without_code.processing - papers-without-code 0.1.dev1+g2508886 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?digest=d81277517bee4d6b0349d71bb2661d4890b5617c" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
@@ -123,7 +123,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../index.html"><div class="brand">papers-without-code 0.1.dev1+g7da4a32 documentation</div></a>
+      <a href="../../index.html"><div class="brand">papers-without-code 0.1.dev1+g2508886 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -146,7 +146,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
   
   
-  <span class="sidebar-brand-text">papers-without-code 0.1.dev1+g7da4a32 documentation</span>
+  <span class="sidebar-brand-text">papers-without-code 0.1.dev1+g2508886 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
   <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
@@ -204,13 +204,11 @@
 <span class="c1"># -*- coding: utf-8 -*-</span>
 
 <span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span>
 
 <span class="kn">from</span> <span class="nn">keybert</span> <span class="kn">import</span> <span class="n">KeyBERT</span>
 
-<span class="kn">from</span> <span class="nn">.grobid</span> <span class="kn">import</span> <span class="n">process_pdf</span><span class="p">,</span> <span class="n">setup_server</span><span class="p">,</span> <span class="n">teardown_server</span>
-<span class="kn">from</span> <span class="nn">.types</span> <span class="kn">import</span> <span class="n">AuthorDetails</span><span class="p">,</span> <span class="n">ParseResult</span><span class="p">,</span> <span class="n">PathLike</span>
+<span class="kn">from</span> <span class="nn">.types</span> <span class="kn">import</span> <span class="n">AuthorDetails</span><span class="p">,</span> <span class="n">ParseResult</span>
 
 <span class="c1">###############################################################################</span>
 
@@ -281,48 +279,13 @@
     <span class="k">return</span> <span class="n">keywords</span>
 
 
-<div class="viewcode-block" id="parse_pdf"><a class="viewcode-back" href="../../papers_without_code.html#papers_without_code.processing.parse_pdf">[docs]</a><span class="k">def</span> <span class="nf">parse_pdf</span><span class="p">(</span>
-    <span class="n">pdf_path</span><span class="p">:</span> <span class="n">PathLike</span><span class="p">,</span>
+<div class="viewcode-block" id="parse_grobid_data"><a class="viewcode-back" href="../../papers_without_code.html#papers_without_code.processing.parse_grobid_data">[docs]</a><span class="k">def</span> <span class="nf">parse_grobid_data</span><span class="p">(</span>
+    <span class="n">grobid_data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
     <span class="n">compute_keywords_with_bert</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-    <span class="n">grobid_server_kws</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{},</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ParseResult</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    # TODO</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># Convert to Path</span>
-    <span class="n">pdf_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">pdf_path</span><span class="p">)</span>
-    <span class="n">pdf_path</span> <span class="o">=</span> <span class="n">pdf_path</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">pdf_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Provided file does not exist: &#39;</span><span class="si">{</span><span class="n">pdf_path</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">pdf_path</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
-        <span class="k">raise</span> <span class="ne">IsADirectoryError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Parsing currently only supports single files. &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;Provided path is a directory: &#39;</span><span class="si">{</span><span class="n">pdf_path</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
-        <span class="p">)</span>
-
-    <span class="c1"># Create GROBID server and client for parsing PDF</span>
-    <span class="n">client</span><span class="p">,</span> <span class="n">container</span> <span class="o">=</span> <span class="n">setup_server</span><span class="p">(</span><span class="o">**</span><span class="n">grobid_server_kws</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">client</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
-            <span class="s2">&quot;Something went wrong during GROBID server setup, &quot;</span>
-            <span class="s2">&quot;stopping and removing container.&quot;</span>
-        <span class="p">)</span>
-        <span class="n">teardown_server</span><span class="p">(</span><span class="n">container</span><span class="p">)</span>
-
-    <span class="c1"># Process the PDF</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">grobid_data</span> <span class="o">=</span> <span class="n">process_pdf</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">pdf_path</span><span class="o">=</span><span class="n">pdf_path</span><span class="p">)</span>
-    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
-        <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
-            <span class="s2">&quot;Something went wrong during GROBID PDF parsing, &quot;</span>
-            <span class="s2">&quot;stopping and removing container.&quot;</span>
-        <span class="p">)</span>
-        <span class="n">teardown_server</span><span class="p">(</span><span class="n">container</span><span class="p">)</span>
-
-    <span class="c1"># Shut down server</span>
-    <span class="c1"># We don&#39;t need it anymore</span>
-    <span class="n">teardown_server</span><span class="p">(</span><span class="n">container</span><span class="p">)</span>
-
     <span class="c1"># Check if bert keywords are desired</span>
     <span class="k">if</span> <span class="n">compute_keywords_with_bert</span><span class="p">:</span>
         <span class="n">bert_keywords</span> <span class="o">=</span> <span class="n">_get_keywords_from_bert</span><span class="p">(</span><span class="n">grobid_data</span><span class="p">)</span>

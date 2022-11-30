@@ -12,6 +12,14 @@ papers\_without\_code.bin.pwoc module
    :undoc-members:
    :show-inheritance:
 
+papers\_without\_code.bin.pwoc\_server module
+---------------------------------------------
+
+.. automodule:: papers_without_code.bin.pwoc_server
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Module contents
 ---------------
 
