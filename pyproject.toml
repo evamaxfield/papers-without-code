@@ -85,6 +85,7 @@ dev = [
 # https://peps.python.org/pep-0621/#entry-points
 [project.entry-points."console_scripts"]
 pwoc = "papers_without_code.bin.pwoc:main"
+pwoc-server = "papers_without_code.bin.pwoc_server:main"
 
 # build settings
 # https://setuptools.pypa.io/en/latest/userguide/pyproject_config.html

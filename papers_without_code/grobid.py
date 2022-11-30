@@ -4,6 +4,7 @@
 import logging
 import os
 import time
+from pathlib import Path
 from typing import Any, Dict, Optional, Tuple
 
 import docker
@@ -25,7 +26,7 @@ DEFAULT_GROBID_PORT = 8070
 ###############################################################################
 
 
-def setup_server(
+def setup_or_connect_to_server(
     image: Optional[str] = None,
     port: Optional[int] = None,
     grobid_client_kws: Dict[str, Any] = {"timeout": 120},
@@ -33,7 +34,7 @@ def setup_server(
     """
     # TODO
     """
-    log.info("Setting up PDF parsing server")
+
     # Handle vars
     if image is None:
         if "GROBID_IMAGE" in os.environ:
@@ -49,45 +50,67 @@ def setup_server(
             port = DEFAULT_GROBID_PORT
 
     # Connect to Docker client
-    client = docker.from_env()
+    docker_client = docker.from_env()
 
     # Check if the image is already downloaded
     try:
-        client.images.get(image)
+        docker_client.images.get(image)
     except docker.errors.ImageNotFound:
-        log.debug(f"Pulling GROBID image: '{image}'")
-        client.images.pull(image)
+        log.info(
+            f"Pulling GROBID image: '{image}' "
+            f"(this will only happen the first time you run Papers Without Code)."
+        )
+        docker_client.images.pull(image)
 
-    # Start container
-    log.debug(f"Using GROBID image: '{image}'")
-    container = client.containers.run(
-        image,
-        ports={"8070/tcp": port},
-        detach=True,
-    )
+    # Check for already running image
+    # Connect or start again
+    found_running_grobid_image = False
+    for container in docker_client.containers.list():
+        if container.image.tags[0] == DEFAULT_GROBID_IMAGE:
+            if container.status == "running":
+                found_running_grobid_image = True
+                break
+            else:
+                log.debug(
+                    f"Found stopped GROBID container "
+                    f"('{container.short_id}') -- Starting."
+                )
+                container.start()
+                time.sleep(5)
+                found_running_grobid_image = True
+                break
+
+    # Start new container
+    if not found_running_grobid_image:
+        log.info("Setting up PDF parsing server.")
+        log.debug(f"Using GROBID image: '{image}'.")
+        container = docker_client.containers.run(
+            image,
+            ports={"8070/tcp": port},
+            detach=True,
+        )
+        log.debug(f"Started GROBID container: '{container.short_id}'.")
+        time.sleep(5)
 
     # Attempt to connect with client
     try:
-        log.debug(f"Started GROBID container: '{container.id}'")
-        time.sleep(5)
-
         # Make request to check the server is alive
         server_url = f"http://127.0.0.1:{port}"
         response = requests.get(f"{server_url}/api/isalive")
         response.raise_for_status()
-        log.debug(f"GROBID API available at: '{server_url}'")
+        log.debug(f"GROBID API available at: '{server_url}'.")
 
         # Create a GROBID Client
-        client = GrobidClient(
+        grobid_client = GrobidClient(
             grobid_server=f"http://localhost:{port}",
             check_server=False,
             **grobid_client_kws,
         )
 
-        return client, container
+        return grobid_client, container
 
     except Exception as e:
-        log.error(f"Failed to connect to GROBID server, error: {e}")
+        log.error(f"Failed to connect to GROBID server, error: '{e}'.")
         return None, container
 
 
@@ -100,7 +123,7 @@ def teardown_server(
     # Stop the container
     container.stop()
     container.remove()
-    log.debug(f"Stopped and removed Docker container: '{container.id}'")
+    log.info(f"Stopped and removed Docker container: '{container.short_id}'.")
 
 
 def process_pdf(
@@ -110,6 +133,17 @@ def process_pdf(
     """
     # TODO
     """
+    # Convert to Path
+    pdf_path = Path(pdf_path)
+    pdf_path = pdf_path.resolve()
+    if not pdf_path.exists():
+        raise FileNotFoundError(f"Provided file does not exist: '{pdf_path}'")
+    if pdf_path.is_dir():
+        raise IsADirectoryError(
+            f"Parsing currently only supports single files. "
+            f"Provided path is a directory: '{pdf_path}'"
+        )
+
     log.info("Parsing PDF, this can sometimes take up to one minute.")
     _, status_code, result_text = client.process_pdf(
         service="processFulltextDocument",

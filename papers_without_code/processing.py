@@ -2,13 +2,11 @@
 # -*- coding: utf-8 -*-
 
 import logging
-from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
 from keybert import KeyBERT
 
-from .grobid import process_pdf, setup_server, teardown_server
-from .types import AuthorDetails, ParseResult, PathLike
+from .types import AuthorDetails, ParseResult
 
 ###############################################################################
 
@@ -79,48 +77,13 @@ def _get_keywords_from_bert(data: Dict[str, Any]) -> List[Tuple[str, float]]:
     return keywords
 
 
-def parse_pdf(
-    pdf_path: PathLike,
+def parse_grobid_data(
+    grobid_data: Dict[str, Any],
     compute_keywords_with_bert: bool = True,
-    grobid_server_kws: Dict[str, Any] = {},
 ) -> ParseResult:
     """
     # TODO
     """
-    # Convert to Path
-    pdf_path = Path(pdf_path)
-    pdf_path = pdf_path.resolve()
-    if not pdf_path.exists():
-        raise FileNotFoundError(f"Provided file does not exist: '{pdf_path}'")
-    if pdf_path.is_dir():
-        raise IsADirectoryError(
-            f"Parsing currently only supports single files. "
-            f"Provided path is a directory: '{pdf_path}'"
-        )
-
-    # Create GROBID server and client for parsing PDF
-    client, container = setup_server(**grobid_server_kws)
-    if client is None:
-        log.error(
-            "Something went wrong during GROBID server setup, "
-            "stopping and removing container."
-        )
-        teardown_server(container)
-
-    # Process the PDF
-    try:
-        grobid_data = process_pdf(client, pdf_path=pdf_path)
-    except ValueError:
-        log.error(
-            "Something went wrong during GROBID PDF parsing, "
-            "stopping and removing container."
-        )
-        teardown_server(container)
-
-    # Shut down server
-    # We don't need it anymore
-    teardown_server(container)
-
     # Check if bert keywords are desired
     if compute_keywords_with_bert:
         bert_keywords = _get_keywords_from_bert(grobid_data)
