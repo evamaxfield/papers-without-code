@@ -12,12 +12,22 @@
 
         <!-- Search for papers -->
         <div class="mzp-c-emphasis-box" style="text-align: left;margin-top: 10vh;margin-bottom: 10vh;">
-            <label class="mzp-c-hero-tagline" for="search">Search
-                <span class="mzp-c-fieldnote" style="margin-top: 20px;">
-                    Provide a DOI for a paper you want to find matching code repositories for.
-                </span>
-            </label>
-            <input style="width:100vw;margin-top: 20px;" type="search" id="search" name="search" placeholder="DOI (e.g. 10.1002/pra2.601)">
+            <form class="mzp-c-form" style="margin-bottom: 0;" method="POST">
+                <label class="mzp-c-hero-tagline" for="search">Search
+                    <span class="mzp-c-fieldnote" style="margin-top: 20px;">
+                        Provide a DOI for a paper you want to find matching code repositories for.
+                    </span>
+                </label>
+                <input
+                    style="width:100vw;margin-top: 20px;"
+                    type="search"
+                    id="search"
+                    required
+                    name="search"
+                    placeholder="DOI (e.g. 10.1002/pra2.601)"
+                />
+                <button class="mzp-c-button" type="submit">Submit</button>
+            </form>
         </div>
     </div>
 </section>
