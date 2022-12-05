@@ -1,12 +1,55 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <!-- Core Meta -->
+        <meta
+            name="title"
+            content="Papers without Code"
+        />
+        <meta
+            name="description"
+            content="Find the code repository for a paper which may not have included a link to their own code."
+        />
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+        <!-- Open Graph / Facebook -->
+        <meta property="og:type" content="website" />
+        <meta
+            property="og:url"
+            content="https://paperswithoutcode.org"
+        />
+        <meta
+            property="og:title"
+            content="Papers without Code"
+        />
+        <meta
+            property="og:description"
+            content="Find the code repository for a paper which may not have included a link to their own code."
+        />
+
+        <!-- Twitter -->
+        <meta
+            property="twitter:url"
+            content="https://paperswithoutcode.org"
+        />
+        <meta
+            property="twitter:title"
+            content="Papers without Code"
+        />
+        <meta
+            property="twitter:description"
+            content="Find the code repository for a paper which may not have included a link to their own code."
+        />
         
+        <!-- Static CSS -->
         <link href="{{ url_for('static', filename='protocol.min.css') }}" rel="stylesheet" type="text/css" />
         <link href="{{ url_for('static', filename='protocol-components.min.css') }}" rel="stylesheet" type="text/css" />
 
+        <!-- Analytics -->
+        <script defer data-domain="paperswithoutcode.org" src="https://plausible.io/js/script.js"></script>
+
+        <!-- Title of Page -->
         <title>{% block title %}Papers without Code{% endblock %}</title>
       </head>
     <body>
