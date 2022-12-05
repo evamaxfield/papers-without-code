@@ -104,7 +104,7 @@ update-from-cookiecutter:
 # App Deployment
 
 # get and store user
-USER := if os_family() == "windows" { env_var("%username%") } else { env_var("USER") }
+USER := if os_family() == "windows" { env_var("%USERNAME%") } else { env_var("USER") }
 
 # Default region for infrastructures
 default_region := "us-central1"
