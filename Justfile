@@ -22,7 +22,7 @@ clean:
 
 # install with all deps
 install:
-	pip install -e .[lint,test,docs,dev]
+	pip install -e .[grobid,lint,test,docs,dev]
 
 # lint, format, and check all files
 lint:
@@ -61,6 +61,29 @@ project_uri := if "os_family()" == "unix" {
 serve-docs:
 	just generate-docs
 	python -mwebbrowser -t "file://{{project_uri}}/docs/_build/index.html"
+
+# update all static files needed for web app
+get-app-static:
+	cd papers_without_code/app/ && npm i
+	cp \
+		papers_without_code/app/node_modules/@mozilla-protocol/core/protocol/css/protocol.min.css \
+		papers_without_code/app/static/
+	cp \
+		papers_without_code/app/node_modules/@mozilla-protocol/core/protocol/css/protocol.min.css.map \
+		papers_without_code/app/static/
+	cp \
+		papers_without_code/app/node_modules/@mozilla-protocol/core/protocol/css/protocol-components.min.css \
+		papers_without_code/app/static/
+	cp \
+		papers_without_code/app/node_modules/@mozilla-protocol/core/protocol/css/protocol-components.min.css.map \
+		papers_without_code/app/static/
+	cp \
+		papers_without_code/app/node_modules/@mozilla-protocol/core/protocol/js/protocol-navigation.min.js \
+		papers_without_code/app/static/
+
+# start flask web server / run pwoc-web-app
+serve-app:
+	pwoc-web-app
 
 # tag a new version
 tag-for-release version:

@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="mzp-c-hero" style="min-height: 82vh;">
+    <div class="mzp-l-content mzp-t-content-lg">
+        <!-- Basic intro -->
+        <h1 class="mzp-c-hero-title">Papers without Code</h1>
+        <div class="mzp-c-hero-body">
+            <div class="mzp-c-hero-desc">
+                <p>Find the code repository for a paper which may not have included a link to their own code.</p>
+            </div>
+        </div>
+
+        <!-- Search for papers -->
+        <div class="mzp-c-emphasis-box" style="text-align: left;margin-top: 10vh;margin-bottom: 10vh;">
+            <label class="mzp-c-hero-tagline" for="search">Search
+                <span class="mzp-c-fieldnote" style="margin-top: 20px;">
+                    Provide a DOI for a paper you want to find matching code repositories for.
+                </span>
+            </label>
+            <input style="width:100vw;margin-top: 20px;" type="search" id="search" name="search" placeholder="DOI (e.g. 10.1002/pra2.601)">
+        </div>
+    </div>
+</section>
+{% endblock %}

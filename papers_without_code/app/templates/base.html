@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        
+        <link href="{{ url_for('static', filename='protocol.min.css') }}" rel="stylesheet" type="text/css" />
+        <link href="{{ url_for('static', filename='protocol-components.min.css') }}" rel="stylesheet" type="text/css" />
+
+        <title>{% block title %}Papers without Code{% endblock %}</title>
+      </head>
+    <body>
+        <!-- Nav -->
+        <div class="mzp-c-navigation mzp-is-sticky">
+            <div class="mzp-c-navigation-l-content">
+                <div class="mzp-c-navigation-container">
+                    <button class="mzp-c-navigation-menu-button" type="button" aria-controls="navigation-demo">
+                        Menu
+                    </button>
+                    <div class="mzp-c-navigation-items" id="navigation-demo">
+                        <div class="mzp-c-navigation-menu">
+                            <nav class="mzp-c-menu mzp-is-basic">
+                                <ul class="mzp-c-menu-category-list">
+                                    <li class="mzp-c-menu-category">
+                                        <a class="mzp-c-menu-title" href="/">
+                                            Papers without Code
+                                        </a>
+                                    </li>
+                                </ul>
+                            </nav>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div>
+            {% block content %} {% endblock %}
+        </div>
+
+        <!-- Footer -->
+        <footer class="mzp-c-footer">
+            <div class="mzp-l-content" style="padding-top:48px;padding-bottom:38px">
+                <nav class="mzp-c-footer-secondary">
+                    <div class="mzp-c-footer-legal">
+                        <p class="mzp-c-footer-license">
+                            Web application, search, and comparison tools was created by <a href="https://evamaxfield.github.io" target="_blank">Eva Maxfield Brown</a>. Styled using <a href="https://protocol.mozilla.org/index.html" target="_blank">Mozilla Protocol</a>
+                        </p>
+                        <ul class="mzp-c-footer-terms">
+                            <li>
+                                <a href="https://github.com/evamaxfield/papers-without-code">
+                                    Papers without Code GitHub Repository
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
+            </div>
+        </footer>
+    </body>
+</html>
