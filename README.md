@@ -1,11 +1,14 @@
 # papers-without-code
 
 [![Build Status](https://github.com/evamaxfield/papers-without-code/workflows/CI/badge.svg)](https://github.com/evamaxfield/papers-without-code/actions)
-[![Documentation](https://github.com/evamaxfield/papers-without-code/workflows/Documentation/badge.svg)](https://evamaxfield.github.io/papers-without-code)
+[![Web Application](https://github.com/evamaxfield/papers-without-code/workflows/CI/badge.svg)](https://paperswithoutcode.org)
+[![Python Package Documentation](https://github.com/evamaxfield/papers-without-code/workflows/Documentation/badge.svg)](https://evamaxfield.github.io/papers-without-code)
 
-A package (and website) to automatically attempt to find the code associated with a paper.
+A Python package ([and website](https://paperswithoutcode.org)) to automatically attempt to find the code associated with a paper.
 
 ---
+
+![Image of the Papers without Code web application homepage](https://raw.githubusercontent.com/evamaxfield/papers-without-code/main/docs/_static/web-landing.png)
 
 ## Installation
 
