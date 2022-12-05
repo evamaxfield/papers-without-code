@@ -15,8 +15,6 @@ def get_paper(doi: str) -> Paper:
 
     # Handle no paper found
     if len(paper.raw_data) == 0:
-        raise ValueError(
-            f"No paper found with DOI: '{doi}'"
-        )
+        raise ValueError(f"No paper found with DOI: '{doi}'")
 
     return paper

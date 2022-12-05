@@ -39,16 +39,19 @@ def _handle_search(request: Request) -> Response:
     search_doi = request.form.get("search")
 
     # Paper was found, reroute to search
-    return redirect(url_for(
-        "views.search",
-        doi=_escape_doi(search_doi),
-    ))
+    return redirect(
+        url_for(
+            "views.search",
+            doi=_escape_doi(search_doi),
+        )
+    )
+
 
 ###############################################################################
 
 
 @views.route("/", methods=["GET", "POST"])
-def index():
+def index() -> str:
     # Handle search submission
     if request.method == "POST":
         return _handle_search(request)
@@ -57,7 +60,7 @@ def index():
 
 
 @views.route("/search/<doi>", methods=["GET", "POST"])
-def search(doi: str):
+def search(doi: str) -> str:
     # Handle new search submission
     if request.method == "POST":
         return _handle_search(request)
