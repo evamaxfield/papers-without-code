@@ -21,7 +21,7 @@ jobs:
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install .[docs]
+          pip install .[grobid,docs]
       - name: Generate Docs
         run: |
           just generate-docs
