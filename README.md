@@ -6,9 +6,9 @@
 
 A Python package ([and website](https://paperswithoutcode.org)) to automatically attempt to find the code associated with a paper.
 
----
-
 ![Image of the Papers without Code web application homepage](https://raw.githubusercontent.com/evamaxfield/papers-without-code/main/docs/_static/web-landing.png)
+
+---
 
 ## Installation
 
