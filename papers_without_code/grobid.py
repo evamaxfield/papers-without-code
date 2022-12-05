@@ -58,7 +58,7 @@ def setup_or_connect_to_server(
     except docker.errors.ImageNotFound:
         log.info(
             f"Pulling GROBID image: '{image}' "
-            f"(this will only happen the first time you run Papers Without Code)."
+            f"(this will only happen the first time you run Papers without Code)."
         )
         docker_client.images.pull(image)
 

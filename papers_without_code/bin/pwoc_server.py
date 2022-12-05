@@ -29,7 +29,7 @@ class Args(argparse.Namespace):
         p = argparse.ArgumentParser(
             prog="pwoc-server",
             description=(
-                "Papers Without Code: GROBID server management. "
+                "Papers without Code: GROBID server management. "
                 "Useful to start a server once then process a bunch of PDFs "
                 "rather than repeated starting and stopping."
             ),

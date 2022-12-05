@@ -25,7 +25,7 @@ class Args(argparse.Namespace):
         p = argparse.ArgumentParser(
             prog="pwoc",
             description=(
-                "Papers Without Code: find code repositories for academic papers."
+                "Papers without Code: find code repositories for academic papers."
             ),
         )
         p.add_argument(
