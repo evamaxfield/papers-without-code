@@ -3,6 +3,7 @@
 
 import argparse
 import logging
+import os
 import sys
 import traceback
 
@@ -50,7 +51,7 @@ def _pwoc_app() -> None:
     app.register_blueprint(views.views, url_prefix="/")
 
     # Run (debug allows live reloading)
-    app.run(debug=True)
+    app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
 
 
 def main() -> None:

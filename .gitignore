@@ -115,3 +115,4 @@ ENV/
 # Project specific
 eda.html
 node_modules/
+.keys/

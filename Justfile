@@ -98,3 +98,80 @@ release:
 update-from-cookiecutter:
 	pip install cookiecutter
 	cookiecutter gh:evamaxfield/cookiecutter-py-package --config-file .cookiecutter.yaml --no-input --overwrite-if-exists --output-dir ..
+
+
+###############################################################################
+# App Deployment
+
+# get and store user
+USER := env_var("USER")
+
+# Default region for infrastructures
+default_region := "us-central1"
+default_key := clean(join(justfile_directory(), "../.keys/pwoc-dev.json"))
+default_project := "papers-without-code"
+
+# run gcloud login
+login:
+  gcloud auth login
+  gcloud auth application-default login
+
+# switch active gcloud project
+switch-project project=default_project:
+	gcloud config set project {{project}}
+
+# generate a service account JSON
+gen-key project=default_project:
+	mkdir -p {{justfile_directory()}}/.keys/
+	rm -rf {{justfile_directory()}}/.keys/{{project}}.json
+	gcloud iam service-accounts create {{project}} \
+		--description="Dev Service Account for {{USER}}" \
+		--display-name="{{project}}"
+	gcloud projects add-iam-policy-binding {{project}} \
+		--member="serviceAccount:{{project}}@{{project}}.iam.gserviceaccount.com" \
+		--role="roles/owner"
+	gcloud iam service-accounts keys create {{justfile_directory()}}/.keys/{{project}}.json \
+		--iam-account "{{project}}@{{project}}.iam.gserviceaccount.com"
+	@ echo "----------------------------------------------------------------------------"
+	@ echo "Sleeping for one minute while resources set up"
+	@ echo "----------------------------------------------------------------------------"
+	sleep 60
+	cp -rf {{justfile_directory()}}/.keys/{{project}}.json {{justfile_directory()}}/.keys/pwoc-dev.json
+	@ echo "----------------------------------------------------------------------------"
+	@ echo "Be sure to update the GOOGLE_APPLICATION_CREDENTIALS environment variable."
+	@ echo "----------------------------------------------------------------------------"
+
+# create a new gcloud project and generate a key
+init project=default_project:
+	gcloud projects create {{project}} --set-as-default
+	echo "----------------------------------------------------------------------------"
+	echo "Follow the link to setup billing for the created GCloud account."
+	echo "https://console.cloud.google.com/billing/linkedaccount?project={{project}}"
+	echo "----------------------------------------------------------------------------"
+	just gen-key {{project}}
+
+# build docker image locally
+build-docker:
+	docker build --tag pwoc-web-app {{justfile_directory()}}
+
+# run docker image locally
+run-docker:
+	docker run --rm -p 9090:8080 -e PORT=8080 pwoc-web-app
+
+# enable gcloud services
+enable-services:
+	gcloud services enable cloudresourcemanager.googleapis.com
+	gcloud services enable cloudfunctions.googleapis.com \
+		cloudbuild.googleapis.com \
+		artifactregistry.googleapis.com \
+		run.googleapis.com
+
+# deploy the web app
+deploy project=default_project region=default_region:
+	just build-docker
+	just enable-services
+	gcloud builds submit --tag gcr.io/{{project}}/paperswithoutcode
+	gcloud run deploy paperswithoutcode \
+		--image gcr.io/{{project}}/paperswithoutcode \
+		--region {{region}} \
+		--allow-unauthenticated
