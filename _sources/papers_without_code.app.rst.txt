@@ -1,0 +1,21 @@
+papers\_without\_code.app package
+=================================
+
+Submodules
+----------
+
+papers\_without\_code.app.views module
+--------------------------------------
+
+.. automodule:: papers_without_code.app.views
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: papers_without_code.app
+   :members:
+   :undoc-members:
+   :show-inheritance:

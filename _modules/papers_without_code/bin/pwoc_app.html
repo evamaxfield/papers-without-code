@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" />
 
     <meta name="generator" content="sphinx-5.3.0, furo 2022.09.29"/>
-        <title>papers_without_code.bin.pwoc_server - papers-without-code 0.1.dev1+g04b6a77 documentation</title>
+        <title>papers_without_code.bin.pwoc_app - papers-without-code 0.1.dev1+g04b6a77 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?digest=d81277517bee4d6b0349d71bb2661d4890b5617c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css" />
@@ -200,7 +200,7 @@
           </label>
         </div>
         <article role="main">
-          <h1>Source code for papers_without_code.bin.pwoc_server</h1><div class="highlight"><pre>
+          <h1>Source code for papers_without_code.bin.pwoc_app</h1><div class="highlight"><pre>
 <span></span><span class="ch">#!/usr/bin/env python</span>
 <span class="c1"># -*- coding: utf-8 -*-</span>
 
@@ -209,13 +209,9 @@
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">traceback</span>
 
-<span class="kn">import</span> <span class="nn">docker</span>
+<span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">Flask</span>
 
-<span class="kn">from</span> <span class="nn">papers_without_code.grobid</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">DEFAULT_GROBID_IMAGE</span><span class="p">,</span>
-    <span class="n">setup_or_connect_to_server</span><span class="p">,</span>
-    <span class="n">teardown_server</span><span class="p">,</span>
-<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">papers_without_code.app</span> <span class="kn">import</span> <span class="n">STATIC_DIR</span><span class="p">,</span> <span class="n">views</span>
 
 <span class="c1">###############################################################################</span>
 
@@ -224,74 +220,43 @@
 <span class="c1">###############################################################################</span>
 
 
-<div class="viewcode-block" id="Args"><a class="viewcode-back" href="../../../papers_without_code.bin.html#papers_without_code.bin.pwoc_server.Args">[docs]</a><span class="k">class</span> <span class="nc">Args</span><span class="p">(</span><span class="n">argparse</span><span class="o">.</span><span class="n">Namespace</span><span class="p">):</span>
+<div class="viewcode-block" id="Args"><a class="viewcode-back" href="../../../papers_without_code.bin.html#papers_without_code.bin.pwoc_app.Args">[docs]</a><span class="k">class</span> <span class="nc">Args</span><span class="p">(</span><span class="n">argparse</span><span class="o">.</span><span class="n">Namespace</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__parse</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">__parse</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">p</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span>
-            <span class="n">prog</span><span class="o">=</span><span class="s2">&quot;pwoc-server&quot;</span><span class="p">,</span>
-            <span class="n">description</span><span class="o">=</span><span class="p">(</span>
-                <span class="s2">&quot;Papers without Code: GROBID server management. &quot;</span>
-                <span class="s2">&quot;Useful to start a server once then process a bunch of PDFs &quot;</span>
-                <span class="s2">&quot;rather than repeated starting and stopping.&quot;</span>
-            <span class="p">),</span>
-        <span class="p">)</span>
-        <span class="n">p</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-            <span class="s2">&quot;--start&quot;</span><span class="p">,</span>
-            <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span>
-            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Start a GROBID server.&quot;</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="n">p</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-            <span class="s2">&quot;--stop&quot;</span><span class="p">,</span>
-            <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span>
-            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Stop a GROBID server.&quot;</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="n">p</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-            <span class="s2">&quot;--shutdown&quot;</span><span class="p">,</span>
-            <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span>
-            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Shutdown and remove all GROBID servers.&quot;</span><span class="p">,</span>
+            <span class="n">prog</span><span class="o">=</span><span class="s2">&quot;pwoc-web-app&quot;</span><span class="p">,</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Papers without Code: Run the web application.&quot;</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="n">p</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
             <span class="s2">&quot;--debug&quot;</span><span class="p">,</span>
             <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;debug&quot;</span><span class="p">,</span>
             <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span>
-            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Run with debug logging.&quot;</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="p">(</span>
+                <span class="s2">&quot;Run with debug logging. &quot;</span>
+                <span class="s2">&quot;Note: the web server is always ran in debug mode, this is for other &quot;</span>
+                <span class="s2">&quot;functional logging.&quot;</span>
+            <span class="p">),</span>
         <span class="p">)</span>
         <span class="n">p</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span><span class="n">namespace</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span></div>
 
 
-<span class="k">def</span> <span class="nf">_pwoc_server</span><span class="p">(</span><span class="n">start</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">stop</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">shutdown</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-    <span class="c1"># They can&#39;t both be true</span>
-    <span class="k">if</span> <span class="n">start</span> <span class="ow">and</span> <span class="n">shutdown</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;Choose one of start, stop, or shutdown. Cannot use more than one.&quot;</span>
-        <span class="p">)</span>
+<span class="k">def</span> <span class="nf">_pwoc_app</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="c1"># Create</span>
+    <span class="n">app</span> <span class="o">=</span> <span class="n">Flask</span><span class="p">(</span>
+        <span class="vm">__name__</span><span class="p">,</span>
+        <span class="n">static_folder</span><span class="o">=</span><span class="n">STATIC_DIR</span><span class="p">,</span>
+    <span class="p">)</span>
 
-    <span class="c1"># Start</span>
-    <span class="k">if</span> <span class="n">start</span><span class="p">:</span>
-        <span class="n">setup_or_connect_to_server</span><span class="p">()</span>
-        <span class="k">return</span>
+    <span class="c1"># Load views</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">register_blueprint</span><span class="p">(</span><span class="n">views</span><span class="o">.</span><span class="n">views</span><span class="p">,</span> <span class="n">url_prefix</span><span class="o">=</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
 
-    <span class="c1"># Just stop</span>
-    <span class="k">if</span> <span class="n">stop</span><span class="p">:</span>
-        <span class="n">docker_client</span> <span class="o">=</span> <span class="n">docker</span><span class="o">.</span><span class="n">from_env</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">container</span> <span class="ow">in</span> <span class="n">docker_client</span><span class="o">.</span><span class="n">containers</span><span class="o">.</span><span class="n">list</span><span class="p">(</span><span class="nb">all</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">container</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">tags</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">DEFAULT_GROBID_IMAGE</span><span class="p">:</span>
-                <span class="n">container</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
-                <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Stopped Docker container: &#39;</span><span class="si">{</span><span class="n">container</span><span class="o">.</span><span class="n">short_id</span><span class="si">}</span><span class="s2">&#39;.&quot;</span><span class="p">)</span>
-        <span class="k">return</span>
-
-    <span class="c1"># Teardown all</span>
-    <span class="k">if</span> <span class="n">shutdown</span><span class="p">:</span>
-        <span class="n">docker_client</span> <span class="o">=</span> <span class="n">docker</span><span class="o">.</span><span class="n">from_env</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">container</span> <span class="ow">in</span> <span class="n">docker_client</span><span class="o">.</span><span class="n">containers</span><span class="o">.</span><span class="n">list</span><span class="p">(</span><span class="nb">all</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">container</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">tags</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">DEFAULT_GROBID_IMAGE</span><span class="p">:</span>
-                <span class="n">teardown_server</span><span class="p">(</span><span class="n">container</span><span class="p">)</span>
-        <span class="k">return</span>
+    <span class="c1"># Run (debug allows live reloading)</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">debug</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../../papers_without_code.bin.html#papers_without_code.bin.pwoc_server.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../../papers_without_code.bin.html#papers_without_code.bin.pwoc_app.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="c1"># Get args</span>
     <span class="n">args</span> <span class="o">=</span> <span class="n">Args</span><span class="p">()</span>
 
@@ -309,7 +274,7 @@
 
     <span class="c1"># Manage servers</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="n">_pwoc_server</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">stop</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">shutdown</span><span class="p">)</span>
+        <span class="n">_pwoc_app</span><span class="p">()</span>
     <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
         <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;=============================================&quot;</span><span class="p">)</span>
         <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span>

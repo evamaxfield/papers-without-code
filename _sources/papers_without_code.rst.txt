@@ -7,6 +7,7 @@ Subpackages
 .. toctree::
    :maxdepth: 4
 
+   papers_without_code.app
    papers_without_code.bin
 
 Submodules
@@ -24,6 +25,14 @@ papers\_without\_code.processing module
 ---------------------------------------
 
 .. automodule:: papers_without_code.processing
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+papers\_without\_code.search module
+-----------------------------------
+
+.. automodule:: papers_without_code.search
    :members:
    :undoc-members:
    :show-inheritance:
