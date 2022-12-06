@@ -83,6 +83,7 @@ def search(q: str) -> str:
         "search-success.html",
         query=query,
         title=paper_details.title,
+        paper_url=paper_details.url,
     )
 
 

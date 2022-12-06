@@ -1,4 +1,8 @@
 {% extends "search.html" %}
 {% block search_results %}
-No paper found with query: '{{ query }}'
+<div id="loading-div">
+    <p class="mzp-c-article-intro">
+        Finding possible repositories for paper: <a href="{{ paper_url }}" target="_blank">'{{ title }}'</a>
+    </p>
+</div>
 {% endblock %}

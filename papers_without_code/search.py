@@ -1,9 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import itertools
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
+from functools import partial
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import List, Optional, Tuple
 
 import backoff
 import requests
@@ -38,26 +41,6 @@ def get_paper(query: str) -> Paper:
     return paper
 
 
-@dataclass
-class Repo:
-    name: str
-    url: str
-    description: str
-
-
-@backoff.on_exception(backoff.expo, HTTP4xxClientError)
-def _search_code_with_title(paper: Paper, api: GhApi) -> Dict[str, Any]:
-    return api(
-        "/search/code",
-        "GET",
-        query=dict(
-            q=f"{paper.title}",
-            # q=f"{paper.title} extension:md OR extension:tex or extension:pdf",
-            per_page=10,
-        ),
-    )
-
-
 def _get_keywords_from_abstract(paper: Paper) -> List[Tuple[str, float]]:
     potential_cache_dir = Path(
         f"./sentence-transformers_{DEFAULT_TRANSFORMER_MODEL}"
@@ -74,36 +57,93 @@ def _get_keywords_from_abstract(paper: Paper) -> List[Tuple[str, float]]:
     )
 
 
+def _get_keywords_from_title(paper: Paper) -> List[Tuple[str, float]]:
+    potential_cache_dir = Path(
+        f"./sentence-transformers_{DEFAULT_TRANSFORMER_MODEL}"
+    ).resolve()
+    if potential_cache_dir.exists():
+        model = str(potential_cache_dir)
+    else:
+        model = DEFAULT_TRANSFORMER_MODEL
+
+    return KeyBERT(model).extract_keywords(
+        paper.title,
+        keyphrase_ngram_range=(1, 3),
+        top_n=5,
+    )
+
+
+@dataclass
+class SearchQueryDataTracker:
+    query_str: str
+    data_from: str
+
+
+@dataclass
+class SearchQueryResponse:
+    query_str: str
+    data_from: str
+    repo_name: str
+    stars: int
+    forks: int
+    watchers: int
+    description: str
+
+
 @backoff.on_exception(backoff.expo, HTTP4xxClientError)
-def _search_code_with_keywords(paper: Paper, api: GhApi) -> Dict[str, Any]:
-    keywords = _get_keywords_from_abstract(paper)
-    just_terms_str = " ".join([word for word, _ in keywords])
-    return api(
-        "/search/code",
+def _search_repos(
+    query: SearchQueryDataTracker, api: GhApi
+) -> List[SearchQueryResponse]:
+    response = api(
+        "/search/repositories",
         "GET",
         query=dict(
-            q=f"{just_terms_str}",
+            q=f"{query.query_str}",
             # q=f"{paper.title} extension:md OR extension:tex or extension:pdf",
             per_page=10,
         ),
     )
 
-
-def _dedupe_code_search_response(response: Dict[str, Any]) -> List[str]:
-    dedupe_repos = set()
+    # Dedupe and process
+    dedupe_repos_strs = set()
+    results = []
     # Unpack items
     for item in response["items"]:
-        repo_details = item["repository"]
-        repo_name = repo_details["name"]
-        owner_name = repo_details["owner"]["login"]
-        dedupe_repos.add(f"{owner_name}/{repo_name}")
+        if not item["fork"]:
+            if item["full_name"] not in dedupe_repos_strs:
+                dedupe_repos_strs.add(item["full_name"])
+                results.append(
+                    SearchQueryResponse(
+                        query_str=query.query_str,
+                        data_from=query.data_from,
+                        repo_name=item["full_name"],
+                        stars=item["stargazers_count"],
+                        forks=item["forks"],
+                        watchers=item["watchers_count"],
+                        description=item["description"],
+                    )
+                )
 
-    return list(dedupe_repos)
+    return results
+
+
+@dataclass
+class RepoReadmeResponse:
+    repo_name: str
+    data_from: str
+    search_query: str
+    readme_text: str
+    stars: int
+    forks: int
+    watchers: int
+    description: str
 
 
 @backoff.on_exception(backoff.expo, HTTPError, max_time=60)
-def _get_repo_readme_content(repo: str) -> Optional[str]:
-    response = requests.get(f"https://github.com/{repo}")
+def _get_repo_readme_content(
+    repo_data: SearchQueryResponse,
+) -> Optional[RepoReadmeResponse]:
+    response = requests.get(f"https://github.com/{repo_data.repo_name}")
     response.raise_for_status()
 
     soup = BeautifulSoup(response.content, "html.parser")
@@ -113,25 +153,35 @@ def _get_repo_readme_content(repo: str) -> Optional[str]:
     if not readme_container:
         return None
 
-    return readme_container.text
+    return RepoReadmeResponse(
+        repo_name=repo_data.repo_name,
+        data_from=repo_data.data_from,
+        search_query=repo_data.query_str,
+        readme_text=readme_container.text,
+        stars=repo_data.stars,
+        forks=repo_data.forks,
+        watchers=repo_data.watchers,
+        description=repo_data.description,
+    )
 
 
 @dataclass
-class RepoAndReadme:
-    repo: str
-    readme: str
-
-
-@dataclass
-class RepoSemanticSim(DataClassJsonMixin):
-    repo: str
+class RepoDetails(DataClassJsonMixin):
+    name: str
+    link: str
+    data_from: str
+    search_query: str
     similarity: float
+    stars: int
+    forks: int
+    watchers: int
+    description: str
 
 
 def _semantic_sim_repos(
-    repos: List[RepoAndReadme],
+    all_repos_details: List[RepoReadmeResponse],
     paper: Paper,
-) -> List[RepoSemanticSim]:
+) -> List[RepoDetails]:
     potential_cache_dir = Path(
         f"./sentence-transformers_{DEFAULT_TRANSFORMER_MODEL}"
     ).resolve()
@@ -140,58 +190,95 @@ def _semantic_sim_repos(
     else:
         model = SentenceTransformer("all-MiniLM-L6-v2")
 
+    # Encode abstract once
+    sem_vec_abstract = model.encode(paper.abstract, convert_to_tensor=True)
+
     # Collapse all readmes
-    semantic_sims = []
-    for repo in repos:
-        sem_vec_readmes = model.encode(repo.readme, convert_to_tensor=True)
-        sem_vec_abstracts = model.encode(paper.abstract, convert_to_tensor=True)
+    complete_repo_details = []
+    for repo_details in all_repos_details:
+        sem_vec_readme = model.encode(repo_details.readme_text, convert_to_tensor=True)
 
         # Compute cosine-similarities
-        score = util.cos_sim(sem_vec_readmes, sem_vec_abstracts).item()
-        semantic_sims.append(
-            RepoSemanticSim(
-                repo=repo.repo,
+        score = util.cos_sim(sem_vec_readme, sem_vec_abstract).item()
+        complete_repo_details.append(
+            RepoDetails(
+                name=repo_details.repo_name,
+                link=f"https://github.com/{repo_details.repo_name}",
+                data_from=repo_details.data_from,
+                search_query=repo_details.search_query,
                 similarity=score,
+                stars=repo_details.stars,
+                forks=repo_details.forks,
+                watchers=repo_details.watchers,
+                description=repo_details.description,
             )
         )
 
-    return semantic_sims
+    return complete_repo_details
 
 
-def get_repos(paper: Paper) -> List[RepoSemanticSim]:
+def get_repos(paper: Paper) -> List[RepoDetails]:
     # Try loading dotenv
     load_dotenv()
 
     # Connect to API
     api = GhApi()
 
-    # Get repos from title search
-    # TODO: thread
-    repos_from_title_search = _search_code_with_title(paper, api)
+    # Get all the queries we want to run
+    # title_samples = _get_random_selections_from_title(paper)
+    title_keywords = [
+        SearchQueryDataTracker(
+            query_str=word,
+            data_from="title",
+        )
+        for word, _ in _get_keywords_from_title(paper)
+    ]
+    # keywords = [word for word, _ in _get_keywords_from_abstract(paper)]
+    abstract_keywords = [
+        SearchQueryDataTracker(
+            query_str=word,
+            data_from="abstract",
+        )
+        for word, _ in _get_keywords_from_abstract(paper)
+    ]
 
-    # TODO: thread
-    # Get keywords from abstract
-    repos_from_keyword_search = _search_code_with_keywords(paper, api)
+    # Reduce in case of duplicates
+    all_query_datas = [*title_keywords, *abstract_keywords]
+    set_queries = []
+    set_query_strs = set()
+    for qd in all_query_datas:
+        if qd.query_str not in set_query_strs:
+            set_queries.append(qd)
+            set_query_strs.add(qd.query_str)
 
-    # Dedupe from both lists
-    dedupe_found_repos = list(
-        set([*repos_from_title_search, *repos_from_keyword_search])
-    )
-    repos_with_readmes = []
-    for repo in dedupe_found_repos:
-        readme_text = _get_repo_readme_content(repo)
-        # Filter out repos without READMEs
-        # TODO: what to do here?
-        if readme_text:
-            repos_with_readmes.append(
-                RepoAndReadme(
-                    repo=repo,
-                    readme=readme_text,
-                )
+    # Create partial search func with API access already attached
+    search_func = partial(_search_repos, api=api)
+
+    # Do a bunch of threading during the search
+    with ThreadPoolExecutor() as exe:
+        # Find repos from GH Search
+        found_repos = itertools.chain(*list(exe.map(search_func, set_queries)))
+
+        # Combine all responses
+        repos_to_parse = []
+        set_repo_strs = set()
+        for found_repo in found_repos:
+            if found_repo.repo_name not in set_repo_strs:
+                repos_to_parse.append(found_repo)
+                set_repo_strs.add(found_repo.repo_name)
+
+        # Get the README for each repo in the set
+        repos_and_readmes = list(
+            exe.map(
+                _get_repo_readme_content,
+                repos_to_parse,
             )
+        )
 
-    # Get semantic sim for them all
-    scores = _semantic_sim_repos(repos_with_readmes, paper)
-    scores = sorted(scores, key=lambda x: x.similarity, reverse=True)
+    # Filter nones from readmes
+    repos_and_readmes = [
+        r_and_r for r_and_r in repos_and_readmes if r_and_r is not None
+    ]
 
-    return scores
+    repos = _semantic_sim_repos(repos_and_readmes, paper)
+    return sorted(repos, key=lambda x: x.similarity, reverse=True)
