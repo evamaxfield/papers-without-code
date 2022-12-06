@@ -50,6 +50,10 @@ def _pwoc_app() -> None:
     # Load views
     app.register_blueprint(views.views, url_prefix="/")
 
+    # Print os.environ has GITHUB_TOKEN
+    runner_has_gh_token = "GITHUB_TOKEN" in os.environ
+    log.info(f"App has access to GitHub Token: {runner_has_gh_token}")
+
     # Run (debug allows live reloading)
     app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
 
