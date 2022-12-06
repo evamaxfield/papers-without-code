@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" />
 
     <meta name="generator" content="sphinx-5.3.0, furo 2022.09.29"/>
-        <title>papers_without_code.search - papers-without-code 0.1.dev1+g4acf036 documentation</title>
+        <title>papers_without_code.search - papers-without-code 0.1.dev1+ge82f913 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?digest=d81277517bee4d6b0349d71bb2661d4890b5617c" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
@@ -123,7 +123,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../index.html"><div class="brand">papers-without-code 0.1.dev1+g4acf036 documentation</div></a>
+      <a href="../../index.html"><div class="brand">papers-without-code 0.1.dev1+ge82f913 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -146,7 +146,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
   
   
-  <span class="sidebar-brand-text">papers-without-code 0.1.dev1+g4acf036 documentation</span>
+  <span class="sidebar-brand-text">papers-without-code 0.1.dev1+ge82f913 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
   <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
@@ -248,7 +248,7 @@
     <span class="n">description</span><span class="p">:</span> <span class="nb">str</span></div>
 
 
-<span class="nd">@backoff</span><span class="o">.</span><span class="n">on_exception</span><span class="p">(</span><span class="n">backoff</span><span class="o">.</span><span class="n">expo</span><span class="p">,</span> <span class="n">HTTP4xxClientError</span><span class="p">,</span> <span class="n">max_time</span><span class="o">=</span><span class="mi">60</span><span class="p">)</span>
+<span class="nd">@backoff</span><span class="o">.</span><span class="n">on_exception</span><span class="p">(</span><span class="n">backoff</span><span class="o">.</span><span class="n">expo</span><span class="p">,</span> <span class="n">HTTP4xxClientError</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">_search_code_with_title</span><span class="p">(</span><span class="n">paper</span><span class="p">:</span> <span class="n">Paper</span><span class="p">,</span> <span class="n">api</span><span class="p">:</span> <span class="n">GhApi</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
     <span class="k">return</span> <span class="n">api</span><span class="p">(</span>
         <span class="s2">&quot;/search/code&quot;</span><span class="p">,</span>
@@ -277,7 +277,7 @@
     <span class="p">)</span>
 
 
-<span class="nd">@backoff</span><span class="o">.</span><span class="n">on_exception</span><span class="p">(</span><span class="n">backoff</span><span class="o">.</span><span class="n">expo</span><span class="p">,</span> <span class="n">HTTP4xxClientError</span><span class="p">,</span> <span class="n">max_time</span><span class="o">=</span><span class="mi">60</span><span class="p">)</span>
+<span class="nd">@backoff</span><span class="o">.</span><span class="n">on_exception</span><span class="p">(</span><span class="n">backoff</span><span class="o">.</span><span class="n">expo</span><span class="p">,</span> <span class="n">HTTP4xxClientError</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">_search_code_with_keywords</span><span class="p">(</span><span class="n">paper</span><span class="p">:</span> <span class="n">Paper</span><span class="p">,</span> <span class="n">api</span><span class="p">:</span> <span class="n">GhApi</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
     <span class="n">keywords</span> <span class="o">=</span> <span class="n">_get_keywords_from_abstract</span><span class="p">(</span><span class="n">paper</span><span class="p">)</span>
     <span class="n">just_terms_str</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">word</span> <span class="k">for</span> <span class="n">word</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">keywords</span><span class="p">])</span>
@@ -370,15 +370,11 @@
 
     <span class="c1"># Get repos from title search</span>
     <span class="c1"># TODO: thread</span>
-    <span class="n">repos_from_title_search</span> <span class="o">=</span> <span class="n">_dedupe_code_search_response</span><span class="p">(</span>
-        <span class="n">_search_code_with_title</span><span class="p">(</span><span class="n">paper</span><span class="p">,</span> <span class="n">api</span><span class="p">),</span>
-    <span class="p">)</span>
+    <span class="n">repos_from_title_search</span> <span class="o">=</span> <span class="n">_search_code_with_title</span><span class="p">(</span><span class="n">paper</span><span class="p">,</span> <span class="n">api</span><span class="p">)</span>
 
     <span class="c1"># TODO: thread</span>
     <span class="c1"># Get keywords from abstract</span>
-    <span class="n">repos_from_keyword_search</span> <span class="o">=</span> <span class="n">_dedupe_code_search_response</span><span class="p">(</span>
-        <span class="n">_search_code_with_keywords</span><span class="p">(</span><span class="n">paper</span><span class="p">,</span> <span class="n">api</span><span class="p">),</span>
-    <span class="p">)</span>
+    <span class="n">repos_from_keyword_search</span> <span class="o">=</span> <span class="n">_search_code_with_keywords</span><span class="p">(</span><span class="n">paper</span><span class="p">,</span> <span class="n">api</span><span class="p">)</span>
 
     <span class="c1"># Dedupe from both lists</span>
     <span class="n">dedupe_found_repos</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
