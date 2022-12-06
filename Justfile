@@ -174,4 +174,5 @@ deploy project=default_project region=default_region:
 	gcloud run deploy paperswithoutcode \
 		--image gcr.io/{{project}}/paperswithoutcode \
 		--region {{region}} \
-		--allow-unauthenticated
+		--allow-unauthenticated \
+		--memory 1Gi
