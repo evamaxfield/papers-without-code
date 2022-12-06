@@ -168,7 +168,6 @@ enable-services:
 
 # deploy the web app
 deploy project=default_project region=default_region:
-	# just build-docker
 	just enable-services
 	gcloud builds submit --tag gcr.io/{{project}}/paperswithoutcode
 	gcloud run deploy paperswithoutcode \
