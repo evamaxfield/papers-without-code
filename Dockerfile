@@ -13,7 +13,6 @@ ENV APP_HOME /app
 WORKDIR $APP_HOME
 COPY . ./
 
-
 # Install git and tree
 RUN apt-get -y update && apt-get -y install git tree
 

@@ -99,6 +99,8 @@ jobs:
     - name: Run Deploy
       run:
         just deploy
+      env:
+        GITHUB_TOKEN: ${{ secrets.GH_PAT }}
 
   # Publish to PyPI if test, lint, and manifest checks passed
   publish:

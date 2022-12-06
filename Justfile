@@ -174,4 +174,5 @@ deploy project=default_project region=default_region:
 		--image gcr.io/{{project}}/paperswithoutcode \
 		--region {{region}} \
 		--allow-unauthenticated \
-		--memory 2Gi
+		--memory 2Gi \
+		--update-env-vars GITHUB_TOKEN={{env_var("GITHUB_TOKEN")}}

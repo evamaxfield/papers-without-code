@@ -19,3 +19,4 @@ Justfile
 LICENSE
 **node_modules
 sentence-transformers_*/
+.env

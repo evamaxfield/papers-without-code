@@ -45,7 +45,7 @@ class Repo:
     description: str
 
 
-@backoff.on_exception(backoff.expo, HTTP4xxClientError, max_time=60)
+@backoff.on_exception(backoff.expo, HTTP4xxClientError)
 def _search_code_with_title(paper: Paper, api: GhApi) -> Dict[str, Any]:
     return api(
         "/search/code",
@@ -74,7 +74,7 @@ def _get_keywords_from_abstract(paper: Paper) -> List[Tuple[str, float]]:
     )
 
 
-@backoff.on_exception(backoff.expo, HTTP4xxClientError, max_time=60)
+@backoff.on_exception(backoff.expo, HTTP4xxClientError)
 def _search_code_with_keywords(paper: Paper, api: GhApi) -> Dict[str, Any]:
     keywords = _get_keywords_from_abstract(paper)
     just_terms_str = " ".join([word for word, _ in keywords])
@@ -167,15 +167,11 @@ def get_repos(paper: Paper) -> List[RepoSemanticSim]:
 
     # Get repos from title search
     # TODO: thread
-    repos_from_title_search = _dedupe_code_search_response(
-        _search_code_with_title(paper, api),
-    )
+    repos_from_title_search = _search_code_with_title(paper, api)
 
     # TODO: thread
     # Get keywords from abstract
-    repos_from_keyword_search = _dedupe_code_search_response(
-        _search_code_with_keywords(paper, api),
-    )
+    repos_from_keyword_search = _search_code_with_keywords(paper, api)
 
     # Dedupe from both lists
     dedupe_found_repos = list(
