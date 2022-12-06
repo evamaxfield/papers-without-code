@@ -13,17 +13,20 @@ ENV APP_HOME /app
 WORKDIR $APP_HOME
 COPY . ./
 
-# Install git
-RUN apt-get -y update && apt-get -y install git
 
-# Install production dependencies.
+# Install git and tree
+RUN apt-get -y update && apt-get -y install git tree
+
+# Install dependencies.
 RUN pip install --no-cache-dir .
 
-# Run the web service on container startup. Here we use the gunicorn
-# webserver, with one worker process and 8 threads.
-# For environments with multiple CPU cores, increase the number of workers
-# to be equal to the cores available.
-# Timeout is set to 0 to disable the timeouts of the workers to allow Cloud Run to handle instance scaling.
+# Download / pre-cache model
+RUN python scripts/cache-sentence-transformers-model.py
+
+# Show all files to verify what is in the image
+RUN tree
+
+# Run the web server on startup
 CMD pwoc-web-app
 
 # [END run_paperswithoutcode_dockerfile]

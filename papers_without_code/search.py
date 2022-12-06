@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 import backoff
@@ -15,6 +16,10 @@ from keybert import KeyBERT
 from requests.exceptions import HTTPError
 from semanticscholar import Paper, SemanticScholar
 from sentence_transformers import SentenceTransformer, util
+
+###############################################################################
+
+DEFAULT_TRANSFORMER_MODEL = "allenai-specter"
 
 ###############################################################################
 
@@ -54,7 +59,15 @@ def _search_code_with_title(paper: Paper, api: GhApi) -> Dict[str, Any]:
 
 
 def _get_keywords_from_abstract(paper: Paper) -> List[Tuple[str, float]]:
-    return KeyBERT().extract_keywords(
+    potential_cache_dir = Path(
+        f"./sentence-transformers_{DEFAULT_TRANSFORMER_MODEL}"
+    ).resolve()
+    if potential_cache_dir.exists():
+        model = str(potential_cache_dir)
+    else:
+        model = DEFAULT_TRANSFORMER_MODEL
+
+    return KeyBERT(model).extract_keywords(
         paper.abstract,
         keyphrase_ngram_range=(1, 3),
         top_n=5,
@@ -119,7 +132,13 @@ def _semantic_sim_repos(
     repos: List[RepoAndReadme],
     paper: Paper,
 ) -> List[RepoSemanticSim]:
-    model = SentenceTransformer("all-MiniLM-L6-v2")
+    potential_cache_dir = Path(
+        f"./sentence-transformers_{DEFAULT_TRANSFORMER_MODEL}"
+    ).resolve()
+    if potential_cache_dir.exists():
+        model = SentenceTransformer(str(potential_cache_dir))
+    else:
+        model = SentenceTransformer("all-MiniLM-L6-v2")
 
     # Collapse all readmes
     semantic_sims = []

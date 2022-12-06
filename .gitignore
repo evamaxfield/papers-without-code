@@ -116,3 +116,4 @@ ENV/
 eda.html
 node_modules/
 .keys/
+sentence-transformers_*/

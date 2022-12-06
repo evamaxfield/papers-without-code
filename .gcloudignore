@@ -18,3 +18,4 @@ CONTRIBUTING.md
 Justfile
 LICENSE
 **node_modules
+sentence-transformers_*/

@@ -168,11 +168,11 @@ enable-services:
 
 # deploy the web app
 deploy project=default_project region=default_region:
-	just build-docker
+	# just build-docker
 	just enable-services
 	gcloud builds submit --tag gcr.io/{{project}}/paperswithoutcode
 	gcloud run deploy paperswithoutcode \
 		--image gcr.io/{{project}}/paperswithoutcode \
 		--region {{region}} \
 		--allow-unauthenticated \
-		--memory 1Gi
+		--memory 2Gi
