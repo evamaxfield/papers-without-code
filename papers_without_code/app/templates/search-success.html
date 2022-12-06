@@ -1,5 +1,46 @@
 {% extends "search.html" %}
 {% block search_results %}
-{{ doi }}
-{{ title }}
+
+<article class="mzp-c-article">
+    <h1 class="mzp-c-article-title">Most Similar Repository</h1>
+    <p class="mzp-c-article-intro">
+        This looks like the most similar match to the provided paper: '{{ title }}' ({{ query }}).
+    </p>
+
+    Finding possible repositories:
+    <div class="loader">
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+      </div>
+</article>
+
+<script>
+    let query = '{{ query }}'
+    escaped_query = query.replaceAll('/', '&#47;').replaceAll(':', '&#58;')
+
+    function process() {
+        fetch(
+            `/process`,
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                redirect: 'follow',
+                body: JSON.stringify({'query': query}),
+                
+            }
+        ).then((response) => {
+            response.json().then((data) => {
+                console.log(data);
+            })
+        })
+    }
+
+    process()
+</script>
+
 {% endblock %}

@@ -7,6 +7,7 @@ from typing import Any, Dict, List, Optional, Tuple
 import backoff
 import requests
 from bs4 import BeautifulSoup
+from dataclasses_json import DataClassJsonMixin
 from dotenv import load_dotenv
 from fastcore.net import HTTP4xxClientError
 from ghapi.all import GhApi
@@ -18,16 +19,16 @@ from sentence_transformers import SentenceTransformer, util
 ###############################################################################
 
 
-def get_paper(doi: str) -> Paper:
+def get_paper(query: str) -> Paper:
     """
     Get a SemanticScholar API connection, get paper, return.
     """
     api = SemanticScholar()
-    paper = api.get_paper(doi)
+    paper = api.get_paper(query)
 
     # Handle no paper found
     if len(paper.raw_data) == 0:
-        raise ValueError(f"No paper found with DOI: '{doi}'")
+        raise ValueError(f"No paper found with DOI: '{query}'")
 
     return paper
 
@@ -109,7 +110,7 @@ class RepoAndReadme:
 
 
 @dataclass
-class RepoSemanticSim:
+class RepoSemanticSim(DataClassJsonMixin):
     repo: str
     similarity: float
 

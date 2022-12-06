@@ -29,6 +29,7 @@ dynamic = ["version"]
 dependencies = [
   "backoff~=2.2",
   "beautifulsoup4~=4.11",
+  "dataclasses-json~=0.5",
   "flask~=2.2",
   "ghapi~=1.0",
   "keybert~=0.7",

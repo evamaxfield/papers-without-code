@@ -15,7 +15,7 @@
             <form class="mzp-c-form" style="margin-bottom: 0;" method="POST">
                 <label class="mzp-c-hero-tagline" for="search">Search
                     <span class="mzp-c-fieldnote" style="margin-top: 20px;">
-                        Provide a DOI for a paper you want to find matching code repositories for.
+                        Provide a DOI, SemanticScholarID, CorpusID, ArXivID, ACL, or URL from <a href="https://semanticscholar.org" target="_blank">semanticscholar.org</a>, <a href="https://arxiv.org" target="_blank">arxiv.org</a>, <a href="https://aclweb.org" target="_blank">aclweb.org</a>, <a href="https://acm.org" target="_blank">acm.org</a>, or <a href="https://biorxiv.org" target="_blank">biorxiv.org</a>. DOIs can be provided as is. All other IDs should be given with their type, for example: <a href="https://doi.org/10.1002/pra2.601"><em>doi:10.1002/pra2.601</em></a> or <a href="https://api.semanticscholar.org/CorpusID:248266768"><em>corpusid:248266768</em></a> or <a href="https://arxiv.org/abs/2204.09110"><em>url:https://arxiv.org/abs/2204.09110</em></a>.
                     </span>
                 </label>
                 <input
@@ -24,7 +24,7 @@
                     id="search"
                     required
                     name="search"
-                    placeholder="DOI (e.g. 10.1002/pra2.601)"
+                    placeholder="doi:10.1002/pra2.601 or corpusid:248266768, etc."
                 />
                 <button class="mzp-c-button" type="submit">Submit</button>
             </form>
