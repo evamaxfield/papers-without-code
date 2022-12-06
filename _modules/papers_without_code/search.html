@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" />
 
     <meta name="generator" content="sphinx-5.3.0, furo 2022.09.29"/>
-        <title>papers_without_code.search - papers-without-code 0.1.dev1+g0cab06f documentation</title>
+        <title>papers_without_code.search - papers-without-code 0.1.dev1+g4d2ce33 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?digest=d81277517bee4d6b0349d71bb2661d4890b5617c" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
@@ -123,7 +123,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../index.html"><div class="brand">papers-without-code 0.1.dev1+g0cab06f documentation</div></a>
+      <a href="../../index.html"><div class="brand">papers-without-code 0.1.dev1+g4d2ce33 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -146,7 +146,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
   
   
-  <span class="sidebar-brand-text">papers-without-code 0.1.dev1+g0cab06f documentation</span>
+  <span class="sidebar-brand-text">papers-without-code 0.1.dev1+g4d2ce33 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
   <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
@@ -210,6 +210,7 @@
 <span class="kn">import</span> <span class="nn">backoff</span>
 <span class="kn">import</span> <span class="nn">requests</span>
 <span class="kn">from</span> <span class="nn">bs4</span> <span class="kn">import</span> <span class="n">BeautifulSoup</span>
+<span class="kn">from</span> <span class="nn">dataclasses_json</span> <span class="kn">import</span> <span class="n">DataClassJsonMixin</span>
 <span class="kn">from</span> <span class="nn">dotenv</span> <span class="kn">import</span> <span class="n">load_dotenv</span>
 <span class="kn">from</span> <span class="nn">fastcore.net</span> <span class="kn">import</span> <span class="n">HTTP4xxClientError</span>
 <span class="kn">from</span> <span class="nn">ghapi.all</span> <span class="kn">import</span> <span class="n">GhApi</span>
@@ -221,16 +222,16 @@
 <span class="c1">###############################################################################</span>
 
 
-<div class="viewcode-block" id="get_paper"><a class="viewcode-back" href="../../papers_without_code.html#papers_without_code.search.get_paper">[docs]</a><span class="k">def</span> <span class="nf">get_paper</span><span class="p">(</span><span class="n">doi</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Paper</span><span class="p">:</span>
+<div class="viewcode-block" id="get_paper"><a class="viewcode-back" href="../../papers_without_code.html#papers_without_code.search.get_paper">[docs]</a><span class="k">def</span> <span class="nf">get_paper</span><span class="p">(</span><span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Paper</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get a SemanticScholar API connection, get paper, return.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">api</span> <span class="o">=</span> <span class="n">SemanticScholar</span><span class="p">()</span>
-    <span class="n">paper</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">get_paper</span><span class="p">(</span><span class="n">doi</span><span class="p">)</span>
+    <span class="n">paper</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">get_paper</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
 
     <span class="c1"># Handle no paper found</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">paper</span><span class="o">.</span><span class="n">raw_data</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No paper found with DOI: &#39;</span><span class="si">{</span><span class="n">doi</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No paper found with DOI: &#39;</span><span class="si">{</span><span class="n">query</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">paper</span></div>
 
@@ -312,7 +313,7 @@
 
 
 <div class="viewcode-block" id="RepoSemanticSim"><a class="viewcode-back" href="../../papers_without_code.html#papers_without_code.search.RepoSemanticSim">[docs]</a><span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">RepoSemanticSim</span><span class="p">:</span>
+<span class="k">class</span> <span class="nc">RepoSemanticSim</span><span class="p">(</span><span class="n">DataClassJsonMixin</span><span class="p">):</span>
     <span class="n">repo</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">similarity</span><span class="p">:</span> <span class="nb">float</span></div>
 
