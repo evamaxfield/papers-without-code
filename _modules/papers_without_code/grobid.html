@@ -4,10 +4,10 @@
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" />
 
-    <meta name="generator" content="sphinx-5.3.0, furo 2022.09.29"/>
-        <title>papers_without_code.grobid - papers-without-code 0.1.dev1+gd8b4c3f documentation</title>
+    <!-- Generated with Sphinx 5.3.0 and Furo 2022.12.07 -->
+        <title>papers_without_code.grobid - papers-without-code 0.1.dev1+g99070d9 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?digest=d81277517bee4d6b0349d71bb2661d4890b5617c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?digest=91d0f0d1c444bdcb17a68e833c7a53903343c195" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
     
@@ -123,7 +123,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../index.html"><div class="brand">papers-without-code 0.1.dev1+gd8b4c3f documentation</div></a>
+      <a href="../../index.html"><div class="brand">papers-without-code 0.1.dev1+g99070d9 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -146,10 +146,10 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
   
   
-  <span class="sidebar-brand-text">papers-without-code 0.1.dev1+gd8b4c3f documentation</span>
+  <span class="sidebar-brand-text">papers-without-code 0.1.dev1+g99070d9 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
-  <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
   <input type="hidden" name="check_keywords" value="yes">
   <input type="hidden" name="area" value="default">
 </form>
@@ -215,7 +215,7 @@
 <span class="kn">import</span> <span class="nn">xmltodict</span>
 <span class="kn">from</span> <span class="nn">grobid_client.grobid_client</span> <span class="kn">import</span> <span class="n">GrobidClient</span>
 
-<span class="kn">from</span> <span class="nn">.types</span> <span class="kn">import</span> <span class="n">PathLike</span>
+<span class="kn">from</span> <span class="nn">.custom_types</span> <span class="kn">import</span> <span class="n">PathLike</span>
 
 <span class="c1">###############################################################################</span>
 
@@ -235,9 +235,31 @@
     <span class="n">grobid_client_kws</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;timeout&quot;</span><span class="p">:</span> <span class="mi">120</span><span class="p">},</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="n">GrobidClient</span><span class="p">],</span> <span class="n">docker</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">containers</span><span class="o">.</span><span class="n">Container</span><span class="p">]:</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    # TODO</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    Setup (or connect to) a GROBID server managed via a local Docker container.</span>
 
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    image: Optional[str]</span>
+<span class="sd">        The Docker image name to use for pulling (if needed)</span>
+<span class="sd">        and creating the container.</span>
+<span class="sd">        Default: None (check environment variables</span>
+<span class="sd">        for GROBID_IMAGE or else use default image)</span>
+<span class="sd">    port: Optional[int]</span>
+<span class="sd">        The port to make available on the GROBID server and Docker container.</span>
+<span class="sd">        Default: None (check environment variables</span>
+<span class="sd">        for GROBID_PORT or else use default default port)</span>
+<span class="sd">    grobid_client_kws: Dict[str, Any]</span>
+<span class="sd">        Any extra GROBID client keyword arguments to pass to client initialization.</span>
+<span class="sd">        Default: {&quot;timeout&quot;: 120}</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Optional[GrobidClient]</span>
+<span class="sd">        If all setup and/or connection was successful, the GROBID client connection.</span>
+<span class="sd">        None if something went wrong.</span>
+<span class="sd">    docker.models.containers.Container</span>
+<span class="sd">        The Docker container object for future management.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Handle vars</span>
     <span class="k">if</span> <span class="n">image</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="s2">&quot;GROBID_IMAGE&quot;</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
@@ -321,7 +343,12 @@
     <span class="n">container</span><span class="p">:</span> <span class="n">docker</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">containers</span><span class="o">.</span><span class="n">Container</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    # TODO</span>
+<span class="sd">    Stop and remove a Docker container.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    container: docker.models.containers.Container</span>
+<span class="sd">        The docker container to stop and remove.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Stop the container</span>
     <span class="n">container</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
@@ -334,7 +361,24 @@
     <span class="n">pdf_path</span><span class="p">:</span> <span class="n">PathLike</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    # TODO</span>
+<span class="sd">    Process a PDF file using a GROBID client.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    client: GrobidClient</span>
+<span class="sd">        A GROBID client to use for processing.</span>
+<span class="sd">    pdf_path: PathLike</span>
+<span class="sd">        The path to the local PDF file to process.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Dict[str, Any]</span>
+<span class="sd">        Paper data.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        Something went wrong during processing.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Convert to Path</span>
     <span class="n">pdf_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">pdf_path</span><span class="p">)</span>
@@ -391,9 +435,7 @@
             
           </div>
           <div class="right-details">
-            <div class="icons">
-              
-            </div>
+            
           </div>
         </div>
         

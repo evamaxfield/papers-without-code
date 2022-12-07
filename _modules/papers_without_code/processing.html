@@ -4,10 +4,10 @@
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" />
 
-    <meta name="generator" content="sphinx-5.3.0, furo 2022.09.29"/>
-        <title>papers_without_code.processing - papers-without-code 0.1.dev1+gd8b4c3f documentation</title>
+    <!-- Generated with Sphinx 5.3.0 and Furo 2022.12.07 -->
+        <title>papers_without_code.processing - papers-without-code 0.1.dev1+g99070d9 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?digest=d81277517bee4d6b0349d71bb2661d4890b5617c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?digest=91d0f0d1c444bdcb17a68e833c7a53903343c195" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
     
@@ -123,7 +123,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../index.html"><div class="brand">papers-without-code 0.1.dev1+gd8b4c3f documentation</div></a>
+      <a href="../../index.html"><div class="brand">papers-without-code 0.1.dev1+g99070d9 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -146,10 +146,10 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
   
   
-  <span class="sidebar-brand-text">papers-without-code 0.1.dev1+gd8b4c3f documentation</span>
+  <span class="sidebar-brand-text">papers-without-code 0.1.dev1+g99070d9 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
-  <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
   <input type="hidden" name="check_keywords" value="yes">
   <input type="hidden" name="area" value="default">
 </form>
@@ -209,7 +209,7 @@
 
 <span class="kn">from</span> <span class="nn">keybert</span> <span class="kn">import</span> <span class="n">KeyBERT</span>
 
-<span class="kn">from</span> <span class="nn">.types</span> <span class="kn">import</span> <span class="n">AuthorDetails</span><span class="p">,</span> <span class="n">ParseResult</span>
+<span class="kn">from</span> <span class="nn">.custom_types</span> <span class="kn">import</span> <span class="n">AuthorDetails</span><span class="p">,</span> <span class="n">MinimalPaperDetails</span>
 
 <span class="c1">###############################################################################</span>
 
@@ -268,38 +268,53 @@
 
 
 <span class="k">def</span> <span class="nf">_get_keywords_from_bert</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]:</span>
-    <span class="c1"># Get all the text of the paper</span>
-    <span class="n">text</span> <span class="o">=</span> <span class="n">_get_paper_text</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="c1"># Get model</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">KeyBERT</span><span class="p">()</span>
 
-    <span class="c1"># Pass into keybert to extract keywords</span>
-    <span class="c1"># model = KeyBERT(model=&quot;allenai/longformer-base-4096&quot;)</span>
-
-    <span class="c1"># Extract keywords</span>
-    <span class="n">keywords</span> <span class="o">=</span> <span class="n">KeyBERT</span><span class="p">()</span><span class="o">.</span><span class="n">extract_keywords</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">keyphrase_ngram_range</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">top_n</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">keywords</span>
+    <span class="c1"># Extract keywords from title</span>
+    <span class="n">title_keywords</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">extract_keywords</span><span class="p">(</span>
+        <span class="n">_get_title</span><span class="p">(</span><span class="n">data</span><span class="p">),</span>
+        <span class="n">keyphrase_ngram_range</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
+        <span class="n">top_n</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+        <span class="n">stop_words</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">abstract_keywords</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">extract_keywords</span><span class="p">(</span>
+        <span class="n">_get_abstract</span><span class="p">(</span><span class="n">data</span><span class="p">),</span>
+        <span class="n">keyphrase_ngram_range</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
+        <span class="n">top_n</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+        <span class="n">stop_words</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">text_keywords</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">extract_keywords</span><span class="p">(</span>
+        <span class="n">_get_paper_text</span><span class="p">(</span><span class="n">data</span><span class="p">),</span>
+        <span class="n">keyphrase_ngram_range</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
+        <span class="n">top_n</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+        <span class="n">stop_words</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="p">[</span><span class="o">*</span><span class="n">title_keywords</span><span class="p">,</span> <span class="o">*</span><span class="n">abstract_keywords</span><span class="p">,</span> <span class="o">*</span><span class="n">text_keywords</span><span class="p">]</span>
 
 
 <div class="viewcode-block" id="parse_grobid_data"><a class="viewcode-back" href="../../papers_without_code.html#papers_without_code.processing.parse_grobid_data">[docs]</a><span class="k">def</span> <span class="nf">parse_grobid_data</span><span class="p">(</span>
     <span class="n">grobid_data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
-    <span class="n">compute_keywords_with_bert</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ParseResult</span><span class="p">:</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MinimalPaperDetails</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    # TODO</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># Check if bert keywords are desired</span>
-    <span class="k">if</span> <span class="n">compute_keywords_with_bert</span><span class="p">:</span>
-        <span class="n">bert_keywords</span> <span class="o">=</span> <span class="n">_get_keywords_from_bert</span><span class="p">(</span><span class="n">grobid_data</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">bert_keywords</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="sd">    Parse GROBID data into a bit more useful form.</span>
 
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    grobid_data: Dict[str, Any]</span>
+<span class="sd">        The data returned from GROBID after processing a PDF.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    MinimalPaperDetails</span>
+<span class="sd">        The parsed GROBID data.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Parse</span>
-    <span class="k">return</span> <span class="n">ParseResult</span><span class="p">(</span>
+    <span class="k">return</span> <span class="n">MinimalPaperDetails</span><span class="p">(</span>
         <span class="n">title</span><span class="o">=</span><span class="n">_get_title</span><span class="p">(</span><span class="n">grobid_data</span><span class="p">),</span>
         <span class="n">authors</span><span class="o">=</span><span class="n">_get_authors</span><span class="p">(</span><span class="n">grobid_data</span><span class="p">),</span>
         <span class="n">abstract</span><span class="o">=</span><span class="n">_get_abstract</span><span class="p">(</span><span class="n">grobid_data</span><span class="p">),</span>
-        <span class="n">listed_keywords</span><span class="o">=</span><span class="n">_get_keywords_from_authors</span><span class="p">(</span><span class="n">grobid_data</span><span class="p">),</span>
-        <span class="n">bert_keywords</span><span class="o">=</span><span class="n">bert_keywords</span><span class="p">,</span>
+        <span class="n">keywords</span><span class="o">=</span><span class="n">_get_keywords_from_bert</span><span class="p">(</span><span class="n">grobid_data</span><span class="p">),</span>
     <span class="p">)</span></div>
 </pre></div>
         </article>
@@ -321,9 +336,7 @@
             
           </div>
           <div class="right-details">
-            <div class="icons">
-              
-            </div>
+            
           </div>
         </div>
         

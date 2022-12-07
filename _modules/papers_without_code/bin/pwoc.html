@@ -4,10 +4,10 @@
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" />
 
-    <meta name="generator" content="sphinx-5.3.0, furo 2022.09.29"/>
-        <title>papers_without_code.bin.pwoc - papers-without-code 0.1.dev1+gd8b4c3f documentation</title>
+    <!-- Generated with Sphinx 5.3.0 and Furo 2022.12.07 -->
+        <title>papers_without_code.bin.pwoc - papers-without-code 0.1.dev1+g99070d9 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?digest=d81277517bee4d6b0349d71bb2661d4890b5617c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?digest=91d0f0d1c444bdcb17a68e833c7a53903343c195" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
     
@@ -123,7 +123,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../../index.html"><div class="brand">papers-without-code 0.1.dev1+gd8b4c3f documentation</div></a>
+      <a href="../../../index.html"><div class="brand">papers-without-code 0.1.dev1+g99070d9 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -146,10 +146,10 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../../index.html">
   
   
-  <span class="sidebar-brand-text">papers-without-code 0.1.dev1+gd8b4c3f documentation</span>
+  <span class="sidebar-brand-text">papers-without-code 0.1.dev1+g99070d9 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../../search.html" role="search">
-  <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
   <input type="hidden" name="check_keywords" value="yes">
   <input type="hidden" name="area" value="default">
 </form>
@@ -208,10 +208,9 @@
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">traceback</span>
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span>
+<span class="kn">from</span> <span class="nn">pprint</span> <span class="kn">import</span> <span class="n">pprint</span>
 
-<span class="kn">from</span> <span class="nn">papers_without_code</span> <span class="kn">import</span> <span class="n">grobid</span><span class="p">,</span> <span class="n">processing</span>
+<span class="kn">from</span> <span class="nn">papers_without_code</span> <span class="kn">import</span> <span class="n">search_for_repos</span>
 
 <span class="c1">###############################################################################</span>
 
@@ -232,9 +231,20 @@
             <span class="p">),</span>
         <span class="p">)</span>
         <span class="n">p</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-            <span class="s2">&quot;pdf_path&quot;</span><span class="p">,</span>
-            <span class="nb">type</span><span class="o">=</span><span class="n">Path</span><span class="p">,</span>
-            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Path to the PDF file to find related repositories for.&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;query_or_pdf_path&quot;</span><span class="p">,</span>
+            <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="p">(</span>
+                <span class="s2">&quot;Query or path to the PDF file to find related repositories for.&quot;</span>
+                <span class="s2">&quot;When providing a path, provide it as you normally would: &quot;</span>
+                <span class="s2">&quot;&#39;/path/to/file.pdf&#39;. &quot;</span>
+                <span class="s2">&quot;When providing a query such as a DOI, SemanticScholarID, &quot;</span>
+                <span class="s2">&quot;CorpusID, ArXivID, ACL, &quot;</span>
+                <span class="s2">&quot;or URL from semanticscholar.org, arxiv.org, aclweb.org, &quot;</span>
+                <span class="s2">&quot;acm.org, or biorxiv.org. DOIs can be provided as is. &quot;</span>
+                <span class="s2">&quot;All other IDs should be given with their type, for example: &quot;</span>
+                <span class="s2">&quot;doi:10.1002/pra2.601 or corpusid:248266768 or &quot;</span>
+                <span class="s2">&quot;url:https://arxiv.org/abs/2204.09110.&quot;</span>
+            <span class="p">),</span>
         <span class="p">)</span>
         <span class="n">p</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
             <span class="s2">&quot;-t&quot;</span><span class="p">,</span>
@@ -255,56 +265,6 @@
         <span class="n">p</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span><span class="n">namespace</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span></div>
 
 
-<span class="k">def</span> <span class="nf">_pwoc</span><span class="p">(</span><span class="n">pdf_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">teardown</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">]:</span>
-    <span class="c1"># Create GROBID server and client for parsing PDF</span>
-    <span class="n">client</span><span class="p">,</span> <span class="n">container</span> <span class="o">=</span> <span class="n">grobid</span><span class="o">.</span><span class="n">setup_or_connect_to_server</span><span class="p">()</span>
-    <span class="k">if</span> <span class="n">client</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">teardown</span><span class="p">:</span>
-            <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
-                <span class="s2">&quot;Something went wrong during GROBID server setup, &quot;</span>
-                <span class="s2">&quot;stopping and removing container.&quot;</span>
-            <span class="p">)</span>
-            <span class="n">grobid</span><span class="o">.</span><span class="n">teardown_server</span><span class="p">(</span><span class="n">container</span><span class="p">)</span>
-            <span class="k">raise</span> <span class="ne">EnvironmentError</span><span class="p">()</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Something went wrong during GROBID server setup.&quot;</span><span class="p">)</span>
-            <span class="k">raise</span> <span class="ne">EnvironmentError</span><span class="p">()</span>
-
-    <span class="c1"># Process the PDF</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">grobid_data</span> <span class="o">=</span> <span class="n">grobid</span><span class="o">.</span><span class="n">process_pdf</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">pdf_path</span><span class="o">=</span><span class="n">pdf_path</span><span class="p">)</span>
-    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">teardown</span><span class="p">:</span>
-            <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Something went wrong during GROBID PDF parsing (Error: &#39;</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&#39;), &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;stopping and removing container.&quot;</span>
-            <span class="p">)</span>
-            <span class="n">grobid</span><span class="o">.</span><span class="n">teardown_server</span><span class="p">(</span><span class="n">container</span><span class="p">)</span>
-            <span class="k">raise</span> <span class="ne">EnvironmentError</span><span class="p">()</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Something went wrong during GROBID PDF parsing (Error: &#39;</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&#39;).&quot;</span><span class="p">)</span>
-            <span class="k">raise</span> <span class="ne">EnvironmentError</span><span class="p">()</span>
-
-    <span class="c1"># Shut down server</span>
-    <span class="c1"># We don&#39;t need it anymore</span>
-    <span class="k">if</span> <span class="n">teardown</span><span class="p">:</span>
-        <span class="n">grobid</span><span class="o">.</span><span class="n">teardown_server</span><span class="p">(</span><span class="n">container</span><span class="p">)</span>
-
-    <span class="c1"># Parse GROBID data</span>
-    <span class="n">parse_results</span> <span class="o">=</span> <span class="n">processing</span><span class="o">.</span><span class="n">parse_grobid_data</span><span class="p">(</span><span class="n">grobid_data</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">parse_results</span><span class="p">)</span>
-
-    <span class="c1"># Warn user that server is still live</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">teardown</span><span class="p">:</span>
-        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-            <span class="s2">&quot;GROBID PDF parsing server is still alive to &quot;</span>
-            <span class="s2">&quot;save time during next `pwoc` usage. &quot;</span>
-            <span class="s2">&quot;You can tear it down later with `pwoc-server --shutdown`.&quot;</span>
-        <span class="p">)</span>
-
-    <span class="k">return</span> <span class="p">[]</span>
-
-
 <div class="viewcode-block" id="main"><a class="viewcode-back" href="../../../papers_without_code.bin.html#papers_without_code.bin.pwoc.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="c1"># Get args</span>
     <span class="n">args</span> <span class="o">=</span> <span class="n">Args</span><span class="p">()</span>
@@ -323,7 +283,20 @@
 
     <span class="c1"># Process</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="n">_pwoc</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">pdf_path</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">teardown</span><span class="p">)</span>
+        <span class="n">repos</span> <span class="o">=</span> <span class="n">search_for_repos</span><span class="p">(</span>
+            <span class="n">query_or_path</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">query_or_pdf_path</span><span class="p">,</span>
+            <span class="n">teardown</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">teardown</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="nb">print</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Most Similar Repository&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;-----------------------&quot;</span><span class="p">)</span>
+        <span class="n">pprint</span><span class="p">(</span><span class="n">repos</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="nb">print</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Other Similar Repositories&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;--------------------------&quot;</span><span class="p">)</span>
+        <span class="n">pprint</span><span class="p">(</span><span class="n">repos</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
     <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
         <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;=============================================&quot;</span><span class="p">)</span>
         <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span>
@@ -358,9 +331,7 @@
             
           </div>
           <div class="right-details">
-            <div class="icons">
-              
-            </div>
+            
           </div>
         </div>
         

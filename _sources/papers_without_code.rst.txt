@@ -13,6 +13,14 @@ Subpackages
 Submodules
 ----------
 
+papers\_without\_code.custom\_types module
+------------------------------------------
+
+.. automodule:: papers_without_code.custom_types
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 papers\_without\_code.grobid module
 -----------------------------------
 
@@ -33,14 +41,6 @@ papers\_without\_code.search module
 -----------------------------------
 
 .. automodule:: papers_without_code.search
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-papers\_without\_code.types module
-----------------------------------
-
-.. automodule:: papers_without_code.types
    :members:
    :undoc-members:
    :show-inheritance:
