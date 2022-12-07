@@ -4,8 +4,8 @@ String.prototype.truncate = String.prototype.truncate ||
     if (this.length <= n) { return this; }
     const subString = this.slice(0, n-1); // the original check
     return (useWordBoundary 
-        ? subString.slice(0, subString.lastIndexOf(" ")) 
-        : subString) + "&hellip;";
+        ? subString.slice(0, subString.lastIndexOf(' ')) 
+        : subString) + '&hellip;';
 };
 
 // Main function to make request and process response
@@ -29,6 +29,11 @@ function processSearch(query) {
                     window.location.replace('/processing-error');
                 };
 
+                if (data.length == 0) {
+                    let noResultsClone = noResultsTemplate.content.cloneNode(true);
+                    loadedContentDiv.appendChild(noResultsClone);
+                }
+
                 // Otherwise update DOM
                 console.log('Found repos:', data);
 
@@ -41,8 +46,10 @@ function processSearch(query) {
                 // Remove loading div
                 loadingDiv.parentNode.removeChild(loadingDiv);
 
-                // Add other matches content
-                loadedContentDiv.querySelector('#all-other-matches-header').innerHTML = "Other Matches"
+                // Add basic content
+                if (data.length > 1) {
+                    loadedContentDiv.querySelector('#all-other-matches-header').innerHTML = 'Other Matches'
+                }
 
                 // Process each repo found
                 let templateClone;

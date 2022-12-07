@@ -45,6 +45,11 @@
     </div>
 </template>
 
+<template id="no-results-template">
+    <h2>No Similar GitHub Repositories Found...</h2>
+</template>
+
+
 <template id="best-match-template">
     <h2>Most Similar Repository</h2>
     <div class="mzp-c-card mzp-c-card-medium">
@@ -93,6 +98,7 @@
     let loadedContentDiv = document.querySelector('#loaded-content');
     let bestMatchDiv = loadedContentDiv.querySelector('#best-match');
     let allOtherMatchesDiv = loadedContentDiv.querySelector('#all-other-matches');
+    let noResultsTemplate = document.querySelector('#no-results-template');
 
     // Process search and update DOM
     processSearch('{{ query }}')

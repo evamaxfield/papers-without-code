@@ -87,7 +87,7 @@ def _get_keywords(
     return model.extract_keywords(
         text,
         keyphrase_ngram_range=(3, 4),
-        top_n=10,
+        top_n=5,
         stop_words=stop_words,
     )
 
