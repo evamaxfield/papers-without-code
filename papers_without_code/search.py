@@ -23,6 +23,7 @@ from sentence_transformers import SentenceTransformer, util
 ###############################################################################
 
 DEFAULT_TRANSFORMER_MODEL = "allenai-specter"
+DEFAULT_LOCAL_CACHE_MODEL = f"./sentence-transformers_{DEFAULT_TRANSFORMER_MODEL}"
 
 ###############################################################################
 
@@ -41,35 +42,45 @@ def get_paper(query: str) -> Paper:
     return paper
 
 
-def _get_keywords_from_abstract(paper: Paper) -> List[Tuple[str, float]]:
-    potential_cache_dir = Path(
-        f"./sentence-transformers_{DEFAULT_TRANSFORMER_MODEL}"
-    ).resolve()
-    if potential_cache_dir.exists():
-        model = str(potential_cache_dir)
-    else:
-        model = DEFAULT_TRANSFORMER_MODEL
+def _get_keywords_from_abstract(
+    paper: Paper,
+    stop_words: Optional[str] = "english",
+    model: Optional[KeyBERT] = None,
+) -> List[Tuple[str, float]]:
+    # Load model
+    if not model:
+        potential_cache_dir = Path(DEFAULT_LOCAL_CACHE_MODEL).resolve()
+        if potential_cache_dir.exists():
+            model = KeyBERT(str(potential_cache_dir))
+        else:
+            model = KeyBERT(DEFAULT_TRANSFORMER_MODEL)
 
-    return KeyBERT(model).extract_keywords(
+    return model.extract_keywords(
         paper.abstract,
-        keyphrase_ngram_range=(1, 3),
-        top_n=5,
+        keyphrase_ngram_range=(3, 4),
+        top_n=10,
+        stop_words=stop_words,
     )
 
 
-def _get_keywords_from_title(paper: Paper) -> List[Tuple[str, float]]:
-    potential_cache_dir = Path(
-        f"./sentence-transformers_{DEFAULT_TRANSFORMER_MODEL}"
-    ).resolve()
-    if potential_cache_dir.exists():
-        model = str(potential_cache_dir)
-    else:
-        model = DEFAULT_TRANSFORMER_MODEL
+def _get_keywords_from_title(
+    paper: Paper,
+    stop_words: Optional[str] = "english",
+    model: Optional[KeyBERT] = None,
+) -> List[Tuple[str, float]]:
+    # Load model
+    if not model:
+        potential_cache_dir = Path(DEFAULT_LOCAL_CACHE_MODEL).resolve()
+        if potential_cache_dir.exists():
+            model = KeyBERT(str(potential_cache_dir))
+        else:
+            model = KeyBERT(DEFAULT_TRANSFORMER_MODEL)
 
-    return KeyBERT(model).extract_keywords(
+    return model.extract_keywords(
         paper.title,
-        keyphrase_ngram_range=(1, 3),
+        keyphrase_ngram_range=(2, 4),
         top_n=5,
+        stop_words=stop_words,
     )
 
 
@@ -77,6 +88,7 @@ def _get_keywords_from_title(paper: Paper) -> List[Tuple[str, float]]:
 class SearchQueryDataTracker:
     query_str: str
     data_from: str
+    strict: bool = False
 
 
 @dataclass
@@ -94,15 +106,25 @@ class SearchQueryResponse:
 def _search_repos(
     query: SearchQueryDataTracker, api: GhApi
 ) -> List[SearchQueryResponse]:
-    response = api(
-        "/search/repositories",
-        "GET",
-        query=dict(
-            q=f"{query.query_str}",
-            # q=f"{paper.title} extension:md OR extension:tex or extension:pdf",
-            per_page=10,
-        ),
-    )
+    # Make request
+    if query.strict:
+        response = api(
+            "/search/repositories",
+            "GET",
+            query=dict(
+                q=f'"{query.query_str}"',
+                per_page=10,
+            ),
+        )
+    else:
+        response = api(
+            "/search/repositories",
+            "GET",
+            query=dict(
+                q=f"{query.query_str}",
+                per_page=10,
+            ),
+        )
 
     # Dedupe and process
     dedupe_repos_strs = set()
@@ -143,9 +165,11 @@ class RepoReadmeResponse:
 def _get_repo_readme_content(
     repo_data: SearchQueryResponse,
 ) -> Optional[RepoReadmeResponse]:
+    # Request repo page
     response = requests.get(f"https://github.com/{repo_data.repo_name}")
     response.raise_for_status()
 
+    # Read README content
     soup = BeautifulSoup(response.content, "html.parser")
     readme_container = soup.find(id="readme")
 
@@ -181,14 +205,15 @@ class RepoDetails(DataClassJsonMixin):
 def _semantic_sim_repos(
     all_repos_details: List[RepoReadmeResponse],
     paper: Paper,
+    model: Optional[SentenceTransformer] = None,
 ) -> List[RepoDetails]:
-    potential_cache_dir = Path(
-        f"./sentence-transformers_{DEFAULT_TRANSFORMER_MODEL}"
-    ).resolve()
-    if potential_cache_dir.exists():
-        model = SentenceTransformer(str(potential_cache_dir))
-    else:
-        model = SentenceTransformer("all-MiniLM-L6-v2")
+    # Load model
+    if not model:
+        potential_cache_dir = Path(DEFAULT_LOCAL_CACHE_MODEL).resolve()
+        if potential_cache_dir.exists():
+            model = SentenceTransformer(str(potential_cache_dir))
+        else:
+            model = SentenceTransformer(DEFAULT_TRANSFORMER_MODEL)
 
     # Encode abstract once
     sem_vec_abstract = model.encode(paper.abstract, convert_to_tensor=True)
@@ -217,7 +242,11 @@ def _semantic_sim_repos(
     return complete_repo_details
 
 
-def get_repos(paper: Paper) -> List[RepoDetails]:
+def get_repos(
+    paper: Paper,
+    loaded_keybert: Optional[KeyBERT] = None,
+    loaded_sent_transformer: Optional[SentenceTransformer] = None,
+) -> List[RepoDetails]:
     # Try loading dotenv
     load_dotenv()
 
@@ -225,25 +254,60 @@ def get_repos(paper: Paper) -> List[RepoDetails]:
     api = GhApi()
 
     # Get all the queries we want to run
-    # title_samples = _get_random_selections_from_title(paper)
-    title_keywords = [
+    title_keywords_no_stop_words = [
         SearchQueryDataTracker(
             query_str=word,
             data_from="title",
+            strict=False,
         )
-        for word, _ in _get_keywords_from_title(paper)
+        for word, _ in _get_keywords_from_title(
+            paper,
+            model=loaded_keybert,
+        )
     ]
-    # keywords = [word for word, _ in _get_keywords_from_abstract(paper)]
-    abstract_keywords = [
+    title_keywords_with_stop_words = [
+        SearchQueryDataTracker(
+            query_str=word,
+            data_from="title",
+            strict=True,
+        )
+        for word, _ in _get_keywords_from_title(
+            paper,
+            model=loaded_keybert,
+            stop_words=None,
+        )
+    ]
+    abstract_keywords_no_stop_words = [
         SearchQueryDataTracker(
             query_str=word,
             data_from="abstract",
+            strict=False,
         )
-        for word, _ in _get_keywords_from_abstract(paper)
+        for word, _ in _get_keywords_from_abstract(
+            paper,
+            model=loaded_keybert,
+        )
+    ]
+    abstract_keywords_with_stop_words = [
+        SearchQueryDataTracker(
+            query_str=word,
+            data_from="abstract",
+            strict=True,
+        )
+        for word, _ in _get_keywords_from_abstract(
+            paper,
+            model=loaded_keybert,
+            stop_words=None,
+        )
     ]
 
     # Reduce in case of duplicates
-    all_query_datas = [*title_keywords, *abstract_keywords]
+    all_query_datas = [
+        *title_keywords_no_stop_words,
+        *title_keywords_with_stop_words,
+        *abstract_keywords_no_stop_words,
+        *abstract_keywords_with_stop_words,
+    ]
     set_queries = []
     set_query_strs = set()
     for qd in all_query_datas:
@@ -280,5 +344,5 @@ def get_repos(paper: Paper) -> List[RepoDetails]:
         r_and_r for r_and_r in repos_and_readmes if r_and_r is not None
     ]
 
-    repos = _semantic_sim_repos(repos_and_readmes, paper)
+    repos = _semantic_sim_repos(repos_and_readmes, paper, model=loaded_sent_transformer)
     return sorted(repos, key=lambda x: x.similarity, reverse=True)
