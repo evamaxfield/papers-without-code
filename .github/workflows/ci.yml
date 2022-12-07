@@ -80,6 +80,8 @@ jobs:
 
   # Deploy web app
   deploy:
+    if: "success() && startsWith(github.ref, 'refs/tags/')"
+    needs: [check-manifest, test, lint]
     runs-on: ubuntu-latest
 
     steps:

@@ -37,8 +37,9 @@ def get_paper(query: str) -> Paper:
     Provide a DOI, SemanticScholarID, CorpusID, ArXivID, ACL,
     or URL from semanticscholar.org, arxiv.org, aclweb.org,
     acm.org, or biorxiv.org. DOIs can be provided as is.
-    All other IDs should be given with their type, for example: doi:10.1002/pra2.601
-    or corpusid:248266768 or url:https://arxiv.org/abs/2204.09110.
+    All other IDs should be given with their type, for example:
+    `doi:doi:10.18653/v1/2020.acl-main.447`
+    or `CorpusID:202558505` or `url:https://arxiv.org/abs/2004.07180`.
 
     Parameters
     ----------
