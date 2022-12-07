@@ -82,10 +82,8 @@
     </div>
 </div>
 
+<!-- Run search -->
 <script>
-    // Parse params
-    let query = '{{ query }}';
-
     // Parse existing DOM
     let topStatement = document.querySelector('#top-statement');
     let loadingDiv = document.querySelector('#loading-div');
@@ -96,89 +94,8 @@
     let bestMatchDiv = loadedContentDiv.querySelector('#best-match');
     let allOtherMatchesDiv = loadedContentDiv.querySelector('#all-other-matches');
 
-    // Add truncate func to String
-    String.prototype.truncate = String.prototype.truncate || 
-        function ( n, useWordBoundary ){
-        if (this.length <= n) { return this; }
-        const subString = this.slice(0, n-1); // the original check
-        return (useWordBoundary 
-            ? subString.slice(0, subString.lastIndexOf(" ")) 
-            : subString) + "&hellip;";
-    };
-
-    // Main function to make request and process response
-    function process() {
-        fetch(
-            `/process`,
-            {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                redirect: 'follow',
-                body: JSON.stringify({'query': query}),
-            }
-        ).then((response) => {
-            response.json().then((data) => {
-                console.log('Found repos:', data);
-
-                // Replace content in top statement
-                topStatement.innerHTML = topStatement.innerHTML.replace(
-                    'Finding possible repositories for paper:',
-                    `${data.length} potential repositories for:`
-                );
-
-                // Remove loading div
-                loadingDiv.parentNode.removeChild(loadingDiv);
-
-                // Add other matches content
-                loadedContentDiv.querySelector('#all-other-matches-header').innerHTML = "Other Matches"
-
-                // Catch error
-                // TODO:
-
-                // Process each repo found
-                let templateClone;
-                data.forEach((repo_data, index) => {
-                    // Get the template for the best match
-                    if (index == 0) {
-                        templateClone = bestMatchTemplate.content.cloneNode(true);
-                    // Get the repeatable template for all other matches
-                    } else {
-                        templateClone = repeatRepoMatchTemplate.content.cloneNode(true);
-                    }
-
-                    // Fill in basic details
-                    templateClone.querySelector('.repo-name').innerHTML = repo_data['name'];
-                    if (repo_data['description']) {
-                        templateClone.querySelector('.repo-description').innerHTML = repo_data['description'].truncate(256, true);
-                    };
-                    templateClone.querySelector('.repo-link').href = repo_data['link'];
-
-                    // Generate repo stats div
-                    let resultRepoStatsClone = resultRepoStatsTemplate.content.cloneNode(true);
-                    resultRepoStatsClone.querySelector('.star-count').innerHTML = repo_data['stars'];
-                    resultRepoStatsClone.querySelector('.watcher-count').innerHTML = repo_data['watchers'];
-                    resultRepoStatsClone.querySelector('.fork-count').innerHTML = repo_data['forks'];
-                    resultRepoStatsClone.querySelector('.query-details').innerHTML = `found from keyword(s) from ${repo_data['data_from']} ('${repo_data['search_query']}')`;
-
-                    // Attach repo stats to template clone
-                    templateClone.querySelector('.repo-stats-container').appendChild(resultRepoStatsClone);
-
-                    // Insert best match
-                    if (index === 0) {
-                        bestMatchDiv.appendChild(templateClone);
-                    // Insert all others
-                    } else {
-                        allOtherMatchesDiv.appendChild(templateClone);
-                    };
-                });
-            });
-        });
-    };
-
-    // Run function
-    process();
+    // Process search and update DOM
+    processSearch('{{ query }}')
 </script>
 
 {% endblock %}

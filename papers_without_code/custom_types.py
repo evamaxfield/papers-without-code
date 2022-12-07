@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, List, Optional, Tuple, Union
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple, Union
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -23,9 +23,9 @@ class AuthorDetails:
 
 
 @dataclass
-class ParseResult:
+class MinimalPaperDetails:
     title: str
     authors: List[AuthorDetails]
     abstract: str
-    listed_keywords: List[str]
-    bert_keywords: Optional[List[Tuple[str, float]]]
+    keywords: Optional[List[Tuple[str, float]]] = None
+    other: Optional[Dict[str, Any]] = None

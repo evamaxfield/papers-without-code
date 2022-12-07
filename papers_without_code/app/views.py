@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-
 from flask import (
     Blueprint,
     Request,
@@ -14,8 +13,8 @@ from flask import (
     url_for,
 )
 
+from .. import search_for_repos
 from ..search import get_paper
-from ..search import search as paper_search
 from . import TEMPLATES_DIR
 
 ###############################################################################
@@ -77,14 +76,14 @@ def search(q: str) -> str:
         paper_details = get_paper(query)
 
     # Handle no paper found with DOI
-    except ValueError:
-        return render_template("search-doi-not-found.html", query=query)
+    except Exception:
+        return redirect(url_for("views.not_found"))
 
     return render_template(
         "search-success.html",
         query=query,
         title=paper_details.title,
-        paper_url=paper_details.url,
+        paper_url=paper_details.other["full_semantic_scholar_data"].url,
     )
 
 
@@ -96,13 +95,39 @@ def process() -> Response:
 
     # Unpack
     query = request.json.get("query", None)
-
     if not query:
         return make_response("must provide query body parameter")
 
     # Run search
-    all_repo_details = paper_search(query)
+    try:
+        all_repo_details = search_for_repos(query)
+    except Exception:
+        return redirect(url_for("views.processing_error"))
 
     # Return as JSON
     repos = [repo_details.to_dict() for repo_details in all_repo_details]
     return make_response(jsonify(repos))
+
+
+@views.route("/not-found/", methods=["GET", "POST"])
+def not_found() -> str:
+    # Handle search submission
+    if request.method == "POST":
+        return _handle_search(request)
+
+    return render_template(
+        "index.html",
+        error_explanation="No Paper Found",
+    )
+
+
+@views.route("/processing-error", methods=["GET", "POST"])
+def processing_error() -> str:
+    # Handle search submission
+    if request.method == "POST":
+        return _handle_search(request)
+
+    return render_template(
+        "index.html",
+        error_explanation="Error Processing Data",
+    )

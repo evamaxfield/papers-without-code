@@ -14,25 +14,27 @@ A Python package ([and website](https://paperswithoutcode.org)) to automatically
 **Stable Release:** `pip install papers-without-code`<br>
 **Development Head:** `pip install git+https://github.com/evamaxfield/papers-without-code.git`
 
-## Quickstart
+## Python Library
 
 From the terminal:
 
 ```bash
 pip install papers-without-code
 
-pwoc path/to/file.pdf
+pwoc query
+# or pwoc path/to/file.pdf
 ```
 
 Or in Python:
 
 ```python
-from papers_without_code import parse_pdf
+from papers_without_code import search_for_repos
 
-parse_pdf("path/to/file.pdf")
+search_for_repos("query")
+# search_for_repos("path/to/file.pdf")
 ```
 
-⚠️ Prior to using PWOC you must be logged in to Docker CLI via `docker login`
+⚠️ Prior to using PWOC with a PDF you must be logged in to Docker CLI via `docker login`
 because we automatically fetch, spin up, and tear down containers for processing. ⚠️
 
 ## Documentation

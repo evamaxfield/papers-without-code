@@ -20,6 +20,8 @@ from requests.exceptions import HTTPError
 from semanticscholar import Paper, SemanticScholar
 from sentence_transformers import SentenceTransformer, util
 
+from .custom_types import MinimalPaperDetails
+
 ###############################################################################
 
 DEFAULT_TRANSFORMER_MODEL = "allenai-specter"
@@ -30,7 +32,28 @@ DEFAULT_LOCAL_CACHE_MODEL = f"./sentence-transformers_{DEFAULT_TRANSFORMER_MODEL
 
 def get_paper(query: str) -> Paper:
     """
-    Get a SemanticScholar API connection, get paper, return.
+    Get a papers details from the Semantic Scholar API.
+
+    Provide a DOI, SemanticScholarID, CorpusID, ArXivID, ACL,
+    or URL from semanticscholar.org, arxiv.org, aclweb.org,
+    acm.org, or biorxiv.org. DOIs can be provided as is.
+    All other IDs should be given with their type, for example: doi:10.1002/pra2.601
+    or corpusid:248266768 or url:https://arxiv.org/abs/2204.09110.
+
+    Parameters
+    ----------
+    query: str
+        The structured paper to query for.
+
+    Returns
+    -------
+    Paper
+        The paper details.
+
+    Raises
+    ------
+    ValueErorr
+        No paper was found.
     """
     api = SemanticScholar()
     paper = api.get_paper(query)
@@ -39,32 +62,17 @@ def get_paper(query: str) -> Paper:
     if len(paper.raw_data) == 0:
         raise ValueError(f"No paper found with DOI: '{query}'")
 
-    return paper
-
-
-def _get_keywords_from_abstract(
-    paper: Paper,
-    stop_words: Optional[str] = "english",
-    model: Optional[KeyBERT] = None,
-) -> List[Tuple[str, float]]:
-    # Load model
-    if not model:
-        potential_cache_dir = Path(DEFAULT_LOCAL_CACHE_MODEL).resolve()
-        if potential_cache_dir.exists():
-            model = KeyBERT(str(potential_cache_dir))
-        else:
-            model = KeyBERT(DEFAULT_TRANSFORMER_MODEL)
-
-    return model.extract_keywords(
-        paper.abstract,
-        keyphrase_ngram_range=(3, 4),
-        top_n=10,
-        stop_words=stop_words,
+    return MinimalPaperDetails(
+        title=paper.title,
+        authors=paper.authors,
+        abstract=paper.abstract,
+        keywords=None,
+        other={"full_semantic_scholar_data": paper},
     )
 
 
-def _get_keywords_from_title(
-    paper: Paper,
+def _get_keywords(
+    text: str,
     stop_words: Optional[str] = "english",
     model: Optional[KeyBERT] = None,
 ) -> List[Tuple[str, float]]:
@@ -77,9 +85,9 @@ def _get_keywords_from_title(
             model = KeyBERT(DEFAULT_TRANSFORMER_MODEL)
 
     return model.extract_keywords(
-        paper.title,
-        keyphrase_ngram_range=(2, 4),
-        top_n=5,
+        text,
+        keyphrase_ngram_range=(3, 4),
+        top_n=10,
         stop_words=stop_words,
     )
 
@@ -87,14 +95,12 @@ def _get_keywords_from_title(
 @dataclass
 class SearchQueryDataTracker:
     query_str: str
-    data_from: str
     strict: bool = False
 
 
 @dataclass
 class SearchQueryResponse:
     query_str: str
-    data_from: str
     repo_name: str
     stars: int
     forks: int
@@ -137,7 +143,6 @@ def _search_repos(
                 results.append(
                     SearchQueryResponse(
                         query_str=query.query_str,
-                        data_from=query.data_from,
                         repo_name=item["full_name"],
                         stars=item["stargazers_count"],
                         forks=item["forks"],
@@ -152,7 +157,6 @@ def _search_repos(
 @dataclass
 class RepoReadmeResponse:
     repo_name: str
-    data_from: str
     search_query: str
     readme_text: str
     stars: int
@@ -179,7 +183,6 @@ def _get_repo_readme_content(
 
     return RepoReadmeResponse(
         repo_name=repo_data.repo_name,
-        data_from=repo_data.data_from,
         search_query=repo_data.query_str,
         readme_text=readme_container.text,
         stars=repo_data.stars,
@@ -193,7 +196,6 @@ def _get_repo_readme_content(
 class RepoDetails(DataClassJsonMixin):
     name: str
     link: str
-    data_from: str
     search_query: str
     similarity: float
     stars: int
@@ -216,7 +218,10 @@ def _semantic_sim_repos(
             model = SentenceTransformer(DEFAULT_TRANSFORMER_MODEL)
 
     # Encode abstract once
-    sem_vec_abstract = model.encode(paper.abstract, convert_to_tensor=True)
+    if paper.abstract:
+        sem_vec_paper = model.encode(paper.abstract, convert_to_tensor=True)
+    else:
+        sem_vec_paper = model.encode(paper.title, convert_to_tensor=True)
 
     # Collapse all readmes
     complete_repo_details = []
@@ -224,12 +229,11 @@ def _semantic_sim_repos(
         sem_vec_readme = model.encode(repo_details.readme_text, convert_to_tensor=True)
 
         # Compute cosine-similarities
-        score = util.cos_sim(sem_vec_readme, sem_vec_abstract).item()
+        score = util.cos_sim(sem_vec_readme, sem_vec_paper).item()
         complete_repo_details.append(
             RepoDetails(
                 name=repo_details.repo_name,
                 link=f"https://github.com/{repo_details.repo_name}",
-                data_from=repo_details.data_from,
                 search_query=repo_details.search_query,
                 similarity=score,
                 stars=repo_details.stars,
@@ -243,86 +247,92 @@ def _semantic_sim_repos(
 
 
 def get_repos(
-    paper: Paper,
+    paper: MinimalPaperDetails,
     loaded_keybert: Optional[KeyBERT] = None,
     loaded_sent_transformer: Optional[SentenceTransformer] = None,
 ) -> List[RepoDetails]:
+    """
+    Try to find GitHub repositories matching a provided paper.
+
+    Parameters
+    ----------
+    paper: MinimalPaperDetails
+        The paper to try and find similar repositories to.
+    loaded_keybert: Optional[KeyBERT]
+        An optional preloaded KeyBERT model to use instead of loading a new one.
+        Default: None
+    loaded_sent_transformer: Optional[SentenceTransformer]
+        An optional preloaded SentenceTransformer model to use
+        instead of loading a new one.
+        Default: None
+
+    Returns
+    -------
+    List[RepoDetails]
+        A list of repositories that are similar to the paper,
+        sorted by each repositories README's semantic similarity
+        to the abstract (or title if no abstract was attached to the paper details).
+    """
     # Try loading dotenv
     load_dotenv()
 
     # Connect to API
     api = GhApi()
 
-    # Get all the queries we want to run
-    if paper.title:
-        title_keywords_no_stop_words = [
-            SearchQueryDataTracker(
-                query_str=word,
-                data_from="title",
-                strict=False,
-            )
-            for word, _ in _get_keywords_from_title(
-                paper,
-                model=loaded_keybert,
-            )
+    # No keywords were provided, generate from abstract and title
+    if not paper.keywords:
+        # Get all the queries we want to run
+        if paper.title:
+            title_keywords = [
+                SearchQueryDataTracker(
+                    query_str=word,
+                    strict=True,
+                )
+                for word, _ in _get_keywords(
+                    paper.title,
+                    model=loaded_keybert,
+                    stop_words=None,
+                )
+            ]
+        else:
+            title_keywords = []
+
+        if paper.abstract:
+            abstract_keywords = [
+                SearchQueryDataTracker(
+                    query_str=word,
+                    strict=True,
+                )
+                for word, _ in _get_keywords(
+                    paper.abstract,
+                    model=loaded_keybert,
+                    stop_words=None,
+                )
+            ]
+        else:
+            abstract_keywords = []
+
+        # Reduce in case of duplicates
+        all_query_datas = [
+            *title_keywords,
+            *abstract_keywords,
         ]
-        title_keywords_with_stop_words = [
+        set_queries = []
+        set_query_strs = set()
+        for qd in all_query_datas:
+            if qd.query_str not in set_query_strs:
+                set_queries.append(qd)
+                set_query_strs.add(qd.query_str)
+
+    # Paper was provided with keywords, use those
+    else:
+        set_queries = [
             SearchQueryDataTracker(
                 query_str=word,
-                data_from="title",
                 strict=True,
             )
-            for word, _ in _get_keywords_from_title(
-                paper,
-                model=loaded_keybert,
-                stop_words=None,
-            )
+            for word, _ in paper.keywords
         ]
-    else:
-        title_keywords_no_stop_words = []
-        title_keywords_with_stop_words = []
-
-    if paper.abstract:
-        abstract_keywords_no_stop_words = [
-            SearchQueryDataTracker(
-                query_str=word,
-                data_from="abstract",
-                strict=False,
-            )
-            for word, _ in _get_keywords_from_abstract(
-                paper,
-                model=loaded_keybert,
-            )
-        ]
-        abstract_keywords_with_stop_words = [
-            SearchQueryDataTracker(
-                query_str=word,
-                data_from="abstract",
-                strict=True,
-            )
-            for word, _ in _get_keywords_from_abstract(
-                paper,
-                model=loaded_keybert,
-                stop_words=None,
-            )
-        ]
-    else:
-        abstract_keywords_no_stop_words = []
-        abstract_keywords_with_stop_words = []
-
-    # Reduce in case of duplicates
-    all_query_datas = [
-        *title_keywords_no_stop_words,
-        *title_keywords_with_stop_words,
-        *abstract_keywords_no_stop_words,
-        *abstract_keywords_with_stop_words,
-    ]
-    set_queries = []
-    set_query_strs = set()
-    for qd in all_query_datas:
-        if qd.query_str not in set_query_strs:
-            set_queries.append(qd)
-            set_query_strs.add(qd.query_str)
 
     # Create partial search func with API access already attached
     search_func = partial(_search_repos, api=api)
@@ -355,23 +365,3 @@ def get_repos(
 
     repos = _semantic_sim_repos(repos_and_readmes, paper, model=loaded_sent_transformer)
     return sorted(repos, key=lambda x: x.similarity, reverse=True)
-
-
-def search(query: str) -> List[RepoDetails]:
-    # Get paper details
-    paper = get_paper(query)
-
-    # Preload models
-    potential_cache_dir = Path(DEFAULT_LOCAL_CACHE_MODEL).resolve()
-    if potential_cache_dir.exists():
-        loaded_sent_transformer = SentenceTransformer(str(potential_cache_dir))
-        loaded_keybert = KeyBERT(str(potential_cache_dir))
-    else:
-        loaded_sent_transformer = SentenceTransformer(DEFAULT_TRANSFORMER_MODEL)
-        loaded_keybert = KeyBERT(DEFAULT_TRANSFORMER_MODEL)
-
-    return get_repos(
-        paper,
-        loaded_keybert=loaded_keybert,
-        loaded_sent_transformer=loaded_sent_transformer,
-    )

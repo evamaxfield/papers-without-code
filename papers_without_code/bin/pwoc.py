@@ -5,10 +5,9 @@ import argparse
 import logging
 import sys
 import traceback
-from pathlib import Path
-from typing import Dict, List
+from pprint import pprint
 
-from papers_without_code import grobid, processing
+from papers_without_code import search_for_repos
 
 ###############################################################################
 
@@ -29,9 +28,20 @@ class Args(argparse.Namespace):
             ),
         )
         p.add_argument(
-            "pdf_path",
-            type=Path,
-            help="Path to the PDF file to find related repositories for.",
+            "query_or_pdf_path",
+            type=str,
+            help=(
+                "Query or path to the PDF file to find related repositories for."
+                "When providing a path, provide it as you normally would: "
+                "'/path/to/file.pdf'. "
+                "When providing a query such as a DOI, SemanticScholarID, "
+                "CorpusID, ArXivID, ACL, "
+                "or URL from semanticscholar.org, arxiv.org, aclweb.org, "
+                "acm.org, or biorxiv.org. DOIs can be provided as is. "
+                "All other IDs should be given with their type, for example: "
+                "doi:10.1002/pra2.601 or corpusid:248266768 or "
+                "url:https://arxiv.org/abs/2204.09110."
+            ),
         )
         p.add_argument(
             "-t",
@@ -52,56 +62,6 @@ class Args(argparse.Namespace):
         p.parse_args(namespace=self)
 
 
-def _pwoc(pdf_path: Path, teardown: bool) -> List[Dict]:
-    # Create GROBID server and client for parsing PDF
-    client, container = grobid.setup_or_connect_to_server()
-    if client is None:
-        if teardown:
-            log.error(
-                "Something went wrong during GROBID server setup, "
-                "stopping and removing container."
-            )
-            grobid.teardown_server(container)
-            raise EnvironmentError()
-        else:
-            log.error("Something went wrong during GROBID server setup.")
-            raise EnvironmentError()
-
-    # Process the PDF
-    try:
-        grobid_data = grobid.process_pdf(client, pdf_path=pdf_path)
-    except Exception as e:
-        if teardown:
-            log.error(
-                f"Something went wrong during GROBID PDF parsing (Error: '{e}'), "
-                f"stopping and removing container."
-            )
-            grobid.teardown_server(container)
-            raise EnvironmentError()
-        else:
-            log.error(f"Something went wrong during GROBID PDF parsing (Error: '{e}').")
-            raise EnvironmentError()
-
-    # Shut down server
-    # We don't need it anymore
-    if teardown:
-        grobid.teardown_server(container)
-
-    # Parse GROBID data
-    parse_results = processing.parse_grobid_data(grobid_data)
-    print(parse_results)
-
-    # Warn user that server is still live
-    if not teardown:
-        log.info(
-            "GROBID PDF parsing server is still alive to "
-            "save time during next `pwoc` usage. "
-            "You can tear it down later with `pwoc-server --shutdown`."
-        )
-
-    return []
-
-
 def main() -> None:
     # Get args
     args = Args()
@@ -120,7 +80,20 @@ def main() -> None:
 
     # Process
     try:
-        _pwoc(args.pdf_path, args.teardown)
+        repos = search_for_repos(
+            query_or_path=args.query_or_pdf_path,
+            teardown=args.teardown,
+        )
+        print()
+        print()
+        print("Most Similar Repository")
+        print("-----------------------")
+        pprint(repos[0])
+        print()
+        print()
+        print("Other Similar Repositories")
+        print("--------------------------")
+        pprint(repos[1:])
     except Exception as e:
         log.error("=============================================")
         log.error("\n\n" + traceback.format_exc())

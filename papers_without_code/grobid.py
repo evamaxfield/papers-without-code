@@ -12,7 +12,7 @@ import requests
 import xmltodict
 from grobid_client.grobid_client import GrobidClient
 
-from .types import PathLike
+from .custom_types import PathLike
 
 ###############################################################################
 
@@ -32,9 +32,31 @@ def setup_or_connect_to_server(
     grobid_client_kws: Dict[str, Any] = {"timeout": 120},
 ) -> Tuple[Optional[GrobidClient], docker.models.containers.Container]:
     """
-    # TODO
-    """
+    Setup (or connect to) a GROBID server managed via a local Docker container.
 
+    Parameters
+    ----------
+    image: Optional[str]
+        The Docker image name to use for pulling (if needed)
+        and creating the container.
+        Default: None (check environment variables
+        for GROBID_IMAGE or else use default image)
+    port: Optional[int]
+        The port to make available on the GROBID server and Docker container.
+        Default: None (check environment variables
+        for GROBID_PORT or else use default default port)
+    grobid_client_kws: Dict[str, Any]
+        Any extra GROBID client keyword arguments to pass to client initialization.
+        Default: {"timeout": 120}
+
+    Returns
+    -------
+    Optional[GrobidClient]
+        If all setup and/or connection was successful, the GROBID client connection.
+        None if something went wrong.
+    docker.models.containers.Container
+        The Docker container object for future management.
+    """
     # Handle vars
     if image is None:
         if "GROBID_IMAGE" in os.environ:
@@ -118,7 +140,12 @@ def teardown_server(
     container: docker.models.containers.Container,
 ) -> None:
     """
-    # TODO
+    Stop and remove a Docker container.
+
+    Parameters
+    ----------
+    container: docker.models.containers.Container
+        The docker container to stop and remove.
     """
     # Stop the container
     container.stop()
@@ -131,7 +158,24 @@ def process_pdf(
     pdf_path: PathLike,
 ) -> Dict[str, Any]:
     """
-    # TODO
+    Process a PDF file using a GROBID client.
+
+    Parameters
+    ----------
+    client: GrobidClient
+        A GROBID client to use for processing.
+    pdf_path: PathLike
+        The path to the local PDF file to process.
+
+    Returns
+    -------
+    Dict[str, Any]
+        Paper data.
+
+    Raises
+    ------
+    ValueError
+        Something went wrong during processing.
     """
     # Convert to Path
     pdf_path = Path(pdf_path)

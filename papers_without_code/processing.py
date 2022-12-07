@@ -6,7 +6,7 @@ from typing import Any, Dict, List, Tuple
 
 from keybert import KeyBERT
 
-from .types import AuthorDetails, ParseResult
+from .custom_types import AuthorDetails, MinimalPaperDetails
 
 ###############################################################################
 
@@ -65,36 +65,51 @@ def _get_paper_text(data: Dict[str, Any]) -> str:
 
 
 def _get_keywords_from_bert(data: Dict[str, Any]) -> List[Tuple[str, float]]:
-    # Get all the text of the paper
-    text = _get_paper_text(data)
+    # Get model
+    model = KeyBERT()
 
-    # Pass into keybert to extract keywords
-    # model = KeyBERT(model="allenai/longformer-base-4096")
-
-    # Extract keywords
-    keywords = KeyBERT().extract_keywords(text, keyphrase_ngram_range=(1, 3), top_n=5)
-
-    return keywords
+    # Extract keywords from title
+    title_keywords = model.extract_keywords(
+        _get_title(data),
+        keyphrase_ngram_range=(3, 4),
+        top_n=5,
+        stop_words=None,
+    )
+    abstract_keywords = model.extract_keywords(
+        _get_abstract(data),
+        keyphrase_ngram_range=(3, 4),
+        top_n=5,
+        stop_words=None,
+    )
+    text_keywords = model.extract_keywords(
+        _get_paper_text(data),
+        keyphrase_ngram_range=(3, 4),
+        top_n=5,
+        stop_words=None,
+    )
+    return [*title_keywords, *abstract_keywords, *text_keywords]
 
 
 def parse_grobid_data(
     grobid_data: Dict[str, Any],
-    compute_keywords_with_bert: bool = True,
-) -> ParseResult:
+) -> MinimalPaperDetails:
     """
-    # TODO
-    """
-    # Check if bert keywords are desired
-    if compute_keywords_with_bert:
-        bert_keywords = _get_keywords_from_bert(grobid_data)
-    else:
-        bert_keywords = None
+    Parse GROBID data into a bit more useful form.
 
+    Parameters
+    ----------
+    grobid_data: Dict[str, Any]
+        The data returned from GROBID after processing a PDF.
+
+    Returns
+    -------
+    MinimalPaperDetails
+        The parsed GROBID data.
+    """
     # Parse
-    return ParseResult(
+    return MinimalPaperDetails(
         title=_get_title(grobid_data),
         authors=_get_authors(grobid_data),
         abstract=_get_abstract(grobid_data),
-        listed_keywords=_get_keywords_from_authors(grobid_data),
-        bert_keywords=bert_keywords,
+        keywords=_get_keywords_from_bert(grobid_data),
     )

@@ -10,12 +10,26 @@
             </div>
         </div>
 
+        <!-- Potential Error -->
+        {% if error_explanation %}
+        <section style="background-color: #f9f9fb;">
+            <div class="mzp-l-content">
+                <h2 class="mzp-c-call-out-title">{{ error_explanation }}</h2>
+                <div class="mzp-c-call-out-desc">
+                    <p>
+                        Please try a different query structure or if you have the paper available locally as a PDF file, you can try <a href="https://github.com/evamaxfield/papers-without-code" target="_blank"> our Python package to parse the PDF</a>.
+                    </p>
+                </div>
+            </div>
+        </section>
+        {% endif %}
+
         <!-- Search for papers -->
         <div class="mzp-c-emphasis-box" style="text-align: left;margin-top: 10vh;margin-bottom: 10vh;">
             <form class="mzp-c-form" style="margin-bottom: 0;" method="POST">
                 <label class="mzp-c-hero-tagline" for="search">Search
                     <span class="mzp-c-fieldnote" style="margin-top: 20px;">
-                        Provide a DOI, SemanticScholarID, CorpusID, ArXivID, ACL, or URL from <a href="https://semanticscholar.org" target="_blank">semanticscholar.org</a>, <a href="https://arxiv.org" target="_blank">arxiv.org</a>, <a href="https://aclweb.org" target="_blank">aclweb.org</a>, <a href="https://acm.org" target="_blank">acm.org</a>, or <a href="https://biorxiv.org" target="_blank">biorxiv.org</a>. DOIs can be provided as is. All other IDs should be given with their type, for example: <a href="https://doi.org/10.1002/pra2.601"><em>doi:10.1002/pra2.601</em></a> or <a href="https://api.semanticscholar.org/CorpusID:248266768"><em>corpusid:248266768</em></a> or <a href="https://arxiv.org/abs/2204.09110"><em>url:https://arxiv.org/abs/2204.09110</em></a>.
+                        Provide a DOI, SemanticScholarID, CorpusID, ArXivID, ACL, or URL from <a href="https://semanticscholar.org" target="_blank">semanticscholar.org</a>, <a href="https://arxiv.org" target="_blank">arxiv.org</a>, <a href="https://aclweb.org" target="_blank">aclweb.org</a>, <a href="https://acm.org" target="_blank">acm.org</a>, or <a href="https://biorxiv.org" target="_blank">biorxiv.org</a>. DOIs can be provided as is. All other IDs should be given with their type, for example: <a href="https://doi.org/10.18653/V1/2020.ACL-MAIN.447 "><em>doi:10.18653/V1/2020.ACL-MAIN.447 </em></a> or <a href="https://api.semanticscholar.org/CorpusID:204509627"><em>corpusid:204509627</em></a> or <a href="https://arxiv.org/abs/2004.07180"><em>url:https://arxiv.org/abs/2004.07180</em></a>.
                     </span>
                 </label>
                 <input
@@ -24,7 +38,7 @@
                     id="search"
                     required
                     name="search"
-                    placeholder="doi:10.1002/pra2.601 or corpusid:248266768, etc."
+                    placeholder="doi:10.18653/V1/2020.ACL-MAIN.447 or corpusid:204509627, etc."
                 />
                 <button class="mzp-c-button" type="submit">Submit</button>
             </form>
