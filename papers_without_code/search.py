@@ -254,52 +254,61 @@ def get_repos(
     api = GhApi()
 
     # Get all the queries we want to run
-    title_keywords_no_stop_words = [
-        SearchQueryDataTracker(
-            query_str=word,
-            data_from="title",
-            strict=False,
-        )
-        for word, _ in _get_keywords_from_title(
-            paper,
-            model=loaded_keybert,
-        )
-    ]
-    title_keywords_with_stop_words = [
-        SearchQueryDataTracker(
-            query_str=word,
-            data_from="title",
-            strict=True,
-        )
-        for word, _ in _get_keywords_from_title(
-            paper,
-            model=loaded_keybert,
-            stop_words=None,
-        )
-    ]
-    abstract_keywords_no_stop_words = [
-        SearchQueryDataTracker(
-            query_str=word,
-            data_from="abstract",
-            strict=False,
-        )
-        for word, _ in _get_keywords_from_abstract(
-            paper,
-            model=loaded_keybert,
-        )
-    ]
-    abstract_keywords_with_stop_words = [
-        SearchQueryDataTracker(
-            query_str=word,
-            data_from="abstract",
-            strict=True,
-        )
-        for word, _ in _get_keywords_from_abstract(
-            paper,
-            model=loaded_keybert,
-            stop_words=None,
-        )
-    ]
+    if paper.title:
+        title_keywords_no_stop_words = [
+            SearchQueryDataTracker(
+                query_str=word,
+                data_from="title",
+                strict=False,
+            )
+            for word, _ in _get_keywords_from_title(
+                paper,
+                model=loaded_keybert,
+            )
+        ]
+        title_keywords_with_stop_words = [
+            SearchQueryDataTracker(
+                query_str=word,
+                data_from="title",
+                strict=True,
+            )
+            for word, _ in _get_keywords_from_title(
+                paper,
+                model=loaded_keybert,
+                stop_words=None,
+            )
+        ]
+    else:
+        title_keywords_no_stop_words = []
+        title_keywords_with_stop_words = []
+
+    if paper.abstract:
+        abstract_keywords_no_stop_words = [
+            SearchQueryDataTracker(
+                query_str=word,
+                data_from="abstract",
+                strict=False,
+            )
+            for word, _ in _get_keywords_from_abstract(
+                paper,
+                model=loaded_keybert,
+            )
+        ]
+        abstract_keywords_with_stop_words = [
+            SearchQueryDataTracker(
+                query_str=word,
+                data_from="abstract",
+                strict=True,
+            )
+            for word, _ in _get_keywords_from_abstract(
+                paper,
+                model=loaded_keybert,
+                stop_words=None,
+            )
+        ]
+    else:
+        abstract_keywords_no_stop_words = []
+        abstract_keywords_with_stop_words = []
 
     # Reduce in case of duplicates
     all_query_datas = [
@@ -346,3 +355,23 @@ def get_repos(
 
     repos = _semantic_sim_repos(repos_and_readmes, paper, model=loaded_sent_transformer)
     return sorted(repos, key=lambda x: x.similarity, reverse=True)
+
+
+def search(query: str) -> List[RepoDetails]:
+    # Get paper details
+    paper = get_paper(query)
+
+    # Preload models
+    potential_cache_dir = Path(DEFAULT_LOCAL_CACHE_MODEL).resolve()
+    if potential_cache_dir.exists():
+        loaded_sent_transformer = SentenceTransformer(str(potential_cache_dir))
+        loaded_keybert = KeyBERT(str(potential_cache_dir))
+    else:
+        loaded_sent_transformer = SentenceTransformer(DEFAULT_TRANSFORMER_MODEL)
+        loaded_keybert = KeyBERT(DEFAULT_TRANSFORMER_MODEL)
+
+    return get_repos(
+        paper,
+        loaded_keybert=loaded_keybert,
+        loaded_sent_transformer=loaded_sent_transformer,
+    )

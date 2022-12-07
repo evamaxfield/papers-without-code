@@ -15,12 +15,8 @@ from flask import (
     url_for,
 )
 
-from ..search import (
-    DEFAULT_LOCAL_CACHE_MODEL,
-    DEFAULT_TRANSFORMER_MODEL,
-    get_paper,
-    get_repos,
-)
+from ..search import get_paper
+from ..search import search as paper_search
 from . import TEMPLATES_DIR
 
 ###############################################################################
@@ -95,9 +91,6 @@ def search(q: str) -> str:
 
 @views.route("/process", methods=["POST"])
 def process() -> Response:
-    from keybert import KeyBERT
-    from sentence_transformers import SentenceTransformer
-
     content_type = request.headers.get("Content-Type")
     if content_type != "application/json":
         return make_response("Content-Type not supported!")
@@ -108,24 +101,9 @@ def process() -> Response:
     if not query:
         return make_response("must provide query body parameter")
 
-    # Return to normal DOI
-    paper = get_paper(query)
+    # Run search
+    all_repo_details = paper_search(query)
 
-    # Preload models
-    potential_cache_dir = Path(DEFAULT_LOCAL_CACHE_MODEL).resolve()
-    if potential_cache_dir.exists():
-        loaded_sent_transformer = SentenceTransformer(str(potential_cache_dir))
-        loaded_keybert = KeyBERT(str(potential_cache_dir))
-    else:
-        loaded_sent_transformer = SentenceTransformer(DEFAULT_TRANSFORMER_MODEL)
-        loaded_keybert = KeyBERT(DEFAULT_TRANSFORMER_MODEL)
-
-    all_repo_details = get_repos(
-        paper,
-        loaded_keybert=loaded_keybert,
-        loaded_sent_transformer=loaded_sent_transformer,
-    )
-
+    # Return as JSON
     repos = [repo_details.to_dict() for repo_details in all_repo_details]
-    # return make_response(jsonify({"paper-title": paper.title}), 200)
     return make_response(jsonify(repos))
