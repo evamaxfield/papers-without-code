@@ -57,9 +57,9 @@ back, we rank them by similarity between the repository's README and the paper's
 abstract (or if not available, it's title).
 
 When using Papers without Code locally and providing a filepath, the only change to
-the system is that we get keywords not only from the paper's title and abstract but
-additionally, we use [GROBID](https://github.com/kermitt2/grobid) to extract
-all text from the paper and then extract keywords from the full text as well.
+this workflow, is keyword extraction. When local and providing a filepath,
+we use [GROBID](https://github.com/kermitt2/grobid) to extract
+keywords from the full text of the paper in addition to the title and abstract.
 
 ## Documentation
 

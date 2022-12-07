@@ -24,7 +24,8 @@ class Args(argparse.Namespace):
         p = argparse.ArgumentParser(
             prog="pwoc",
             description=(
-                "Papers without Code: find code repositories for academic papers."
+                "Papers without Code: Find GitHub repositories similar "
+                "to academic papers."
             ),
         )
         p.add_argument(
@@ -86,14 +87,25 @@ def main() -> None:
         )
         print()
         print()
-        print("Most Similar Repository")
-        print("-----------------------")
-        pprint(repos[0])
-        print()
-        print()
-        print("Other Similar Repositories")
-        print("--------------------------")
-        pprint(repos[1:])
+
+        # Handle nothing found
+        if len(repos) == 0:
+            print("No repositories found which were similar.")
+
+        # At least one
+        else:
+            print("Most Similar Repository")
+            print("-----------------------")
+            pprint(repos[0])
+
+        # More
+        if len(repos) > 1:
+            print()
+            print()
+            print("Other Similar Repositories")
+            print("--------------------------")
+            pprint(repos[1:])
+
     except Exception as e:
         log.error("=============================================")
         log.error("\n\n" + traceback.format_exc())
