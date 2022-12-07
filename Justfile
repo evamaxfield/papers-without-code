@@ -103,9 +103,6 @@ update-from-cookiecutter:
 ###############################################################################
 # App Deployment
 
-# get and store user
-USER := if os_family() == "windows" { env_var("%USERNAME%") } else { env_var("USER") }
-
 # Default region for infrastructures
 default_region := "us-central1"
 default_key := clean(join(justfile_directory(), "../.keys/pwoc-dev.json"))
@@ -125,7 +122,7 @@ gen-key project=default_project:
 	mkdir -p {{justfile_directory()}}/.keys/
 	rm -rf {{justfile_directory()}}/.keys/{{project}}.json
 	gcloud iam service-accounts create {{project}} \
-		--description="Dev Service Account for {{USER}}" \
+		--description="Dev Service Account" \
 		--display-name="{{project}}"
 	gcloud projects add-iam-policy-binding {{project}} \
 		--member="serviceAccount:{{project}}@{{project}}.iam.gserviceaccount.com" \

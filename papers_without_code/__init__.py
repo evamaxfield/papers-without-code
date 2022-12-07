@@ -10,7 +10,7 @@ from typing import List
 from keybert import KeyBERT
 from sentence_transformers import SentenceTransformer
 
-from . import custom_types, grobid, processing, search
+from . import custom_types, processing, search
 
 try:
     __version__ = version("papers-without-code")
@@ -36,6 +36,8 @@ log = logging.getLogger(__name__)
 def _get_paper_from_file(
     pdf_path: custom_types.PathLike, teardown: bool = False
 ) -> custom_types.MinimalPaperDetails:
+    from . import grobid
+
     # Create GROBID server and client for parsing PDF
     client, container = grobid.setup_or_connect_to_server()
     if client is None:

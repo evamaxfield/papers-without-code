@@ -17,6 +17,6 @@ CODE_OF_CONDUCT.md
 CONTRIBUTING.md
 Justfile
 LICENSE
-**node_modules
+**node_modules/**
 sentence-transformers_*/
 .env

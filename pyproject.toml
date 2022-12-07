@@ -106,10 +106,10 @@ zip-safe = false
 include-package-data = true
 
 [tool.setuptools.packages.find]
-exclude = ["*docs/*", "*tests/*"]
+exclude = ["*docs/*", "*tests/*", "**/node_modules/**"]
 
 [tool.setuptools.package-data]
-"*" = ["*.yaml", "py.typed"]
+"*" = ["*.yaml", "py.typed", "*.css", "*html", "*js", "*.css.map"]
 
 # tools
 [tool.black]
@@ -133,8 +133,14 @@ ignore = [
   "CONTRIBUTING.md",
   "Justfile",
   ".cookiecutter.yaml",
-  "*docs/*",
+  "*docs/**",
   "*data/*",
+  ".dockerignore",
+  ".gcloudignore",
+  "Dockerfile",
+  "package-lock.json",
+  "package.json",
+  "**/node_modules/**"
 ]
 
 [tool.mypy]
