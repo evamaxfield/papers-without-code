@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" />
 
     <meta name="generator" content="sphinx-5.3.0, furo 2022.09.29"/>
-        <title>papers_without_code.search - papers-without-code 0.1.dev1+gf813f4a documentation</title>
+        <title>papers_without_code.search - papers-without-code 0.1.dev1+gd8b4c3f documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?digest=d81277517bee4d6b0349d71bb2661d4890b5617c" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
@@ -123,7 +123,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../index.html"><div class="brand">papers-without-code 0.1.dev1+gf813f4a documentation</div></a>
+      <a href="../../index.html"><div class="brand">papers-without-code 0.1.dev1+gd8b4c3f documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -146,7 +146,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
   
   
-  <span class="sidebar-brand-text">papers-without-code 0.1.dev1+gf813f4a documentation</span>
+  <span class="sidebar-brand-text">papers-without-code 0.1.dev1+gd8b4c3f documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
   <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
@@ -457,52 +457,61 @@
     <span class="n">api</span> <span class="o">=</span> <span class="n">GhApi</span><span class="p">()</span>
 
     <span class="c1"># Get all the queries we want to run</span>
-    <span class="n">title_keywords_no_stop_words</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="n">SearchQueryDataTracker</span><span class="p">(</span>
-            <span class="n">query_str</span><span class="o">=</span><span class="n">word</span><span class="p">,</span>
-            <span class="n">data_from</span><span class="o">=</span><span class="s2">&quot;title&quot;</span><span class="p">,</span>
-            <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="k">for</span> <span class="n">word</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">_get_keywords_from_title</span><span class="p">(</span>
-            <span class="n">paper</span><span class="p">,</span>
-            <span class="n">model</span><span class="o">=</span><span class="n">loaded_keybert</span><span class="p">,</span>
-        <span class="p">)</span>
-    <span class="p">]</span>
-    <span class="n">title_keywords_with_stop_words</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="n">SearchQueryDataTracker</span><span class="p">(</span>
-            <span class="n">query_str</span><span class="o">=</span><span class="n">word</span><span class="p">,</span>
-            <span class="n">data_from</span><span class="o">=</span><span class="s2">&quot;title&quot;</span><span class="p">,</span>
-            <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="k">for</span> <span class="n">word</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">_get_keywords_from_title</span><span class="p">(</span>
-            <span class="n">paper</span><span class="p">,</span>
-            <span class="n">model</span><span class="o">=</span><span class="n">loaded_keybert</span><span class="p">,</span>
-            <span class="n">stop_words</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="p">)</span>
-    <span class="p">]</span>
-    <span class="n">abstract_keywords_no_stop_words</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="n">SearchQueryDataTracker</span><span class="p">(</span>
-            <span class="n">query_str</span><span class="o">=</span><span class="n">word</span><span class="p">,</span>
-            <span class="n">data_from</span><span class="o">=</span><span class="s2">&quot;abstract&quot;</span><span class="p">,</span>
-            <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="k">for</span> <span class="n">word</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">_get_keywords_from_abstract</span><span class="p">(</span>
-            <span class="n">paper</span><span class="p">,</span>
-            <span class="n">model</span><span class="o">=</span><span class="n">loaded_keybert</span><span class="p">,</span>
-        <span class="p">)</span>
-    <span class="p">]</span>
-    <span class="n">abstract_keywords_with_stop_words</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="n">SearchQueryDataTracker</span><span class="p">(</span>
-            <span class="n">query_str</span><span class="o">=</span><span class="n">word</span><span class="p">,</span>
-            <span class="n">data_from</span><span class="o">=</span><span class="s2">&quot;abstract&quot;</span><span class="p">,</span>
-            <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="k">for</span> <span class="n">word</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">_get_keywords_from_abstract</span><span class="p">(</span>
-            <span class="n">paper</span><span class="p">,</span>
-            <span class="n">model</span><span class="o">=</span><span class="n">loaded_keybert</span><span class="p">,</span>
-            <span class="n">stop_words</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="p">)</span>
-    <span class="p">]</span>
+    <span class="k">if</span> <span class="n">paper</span><span class="o">.</span><span class="n">title</span><span class="p">:</span>
+        <span class="n">title_keywords_no_stop_words</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">SearchQueryDataTracker</span><span class="p">(</span>
+                <span class="n">query_str</span><span class="o">=</span><span class="n">word</span><span class="p">,</span>
+                <span class="n">data_from</span><span class="o">=</span><span class="s2">&quot;title&quot;</span><span class="p">,</span>
+                <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">word</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">_get_keywords_from_title</span><span class="p">(</span>
+                <span class="n">paper</span><span class="p">,</span>
+                <span class="n">model</span><span class="o">=</span><span class="n">loaded_keybert</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">]</span>
+        <span class="n">title_keywords_with_stop_words</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">SearchQueryDataTracker</span><span class="p">(</span>
+                <span class="n">query_str</span><span class="o">=</span><span class="n">word</span><span class="p">,</span>
+                <span class="n">data_from</span><span class="o">=</span><span class="s2">&quot;title&quot;</span><span class="p">,</span>
+                <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">word</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">_get_keywords_from_title</span><span class="p">(</span>
+                <span class="n">paper</span><span class="p">,</span>
+                <span class="n">model</span><span class="o">=</span><span class="n">loaded_keybert</span><span class="p">,</span>
+                <span class="n">stop_words</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">title_keywords_no_stop_words</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">title_keywords_with_stop_words</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">if</span> <span class="n">paper</span><span class="o">.</span><span class="n">abstract</span><span class="p">:</span>
+        <span class="n">abstract_keywords_no_stop_words</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">SearchQueryDataTracker</span><span class="p">(</span>
+                <span class="n">query_str</span><span class="o">=</span><span class="n">word</span><span class="p">,</span>
+                <span class="n">data_from</span><span class="o">=</span><span class="s2">&quot;abstract&quot;</span><span class="p">,</span>
+                <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">word</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">_get_keywords_from_abstract</span><span class="p">(</span>
+                <span class="n">paper</span><span class="p">,</span>
+                <span class="n">model</span><span class="o">=</span><span class="n">loaded_keybert</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">]</span>
+        <span class="n">abstract_keywords_with_stop_words</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">SearchQueryDataTracker</span><span class="p">(</span>
+                <span class="n">query_str</span><span class="o">=</span><span class="n">word</span><span class="p">,</span>
+                <span class="n">data_from</span><span class="o">=</span><span class="s2">&quot;abstract&quot;</span><span class="p">,</span>
+                <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">word</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">_get_keywords_from_abstract</span><span class="p">(</span>
+                <span class="n">paper</span><span class="p">,</span>
+                <span class="n">model</span><span class="o">=</span><span class="n">loaded_keybert</span><span class="p">,</span>
+                <span class="n">stop_words</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">abstract_keywords_no_stop_words</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">abstract_keywords_with_stop_words</span> <span class="o">=</span> <span class="p">[]</span>
 
     <span class="c1"># Reduce in case of duplicates</span>
     <span class="n">all_query_datas</span> <span class="o">=</span> <span class="p">[</span>
@@ -549,6 +558,26 @@
 
     <span class="n">repos</span> <span class="o">=</span> <span class="n">_semantic_sim_repos</span><span class="p">(</span><span class="n">repos_and_readmes</span><span class="p">,</span> <span class="n">paper</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="n">loaded_sent_transformer</span><span class="p">)</span>
     <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">repos</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">similarity</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="search"><a class="viewcode-back" href="../../papers_without_code.html#papers_without_code.search.search">[docs]</a><span class="k">def</span> <span class="nf">search</span><span class="p">(</span><span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">RepoDetails</span><span class="p">]:</span>
+    <span class="c1"># Get paper details</span>
+    <span class="n">paper</span> <span class="o">=</span> <span class="n">get_paper</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+
+    <span class="c1"># Preload models</span>
+    <span class="n">potential_cache_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">DEFAULT_LOCAL_CACHE_MODEL</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">potential_cache_dir</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+        <span class="n">loaded_sent_transformer</span> <span class="o">=</span> <span class="n">SentenceTransformer</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">potential_cache_dir</span><span class="p">))</span>
+        <span class="n">loaded_keybert</span> <span class="o">=</span> <span class="n">KeyBERT</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">potential_cache_dir</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">loaded_sent_transformer</span> <span class="o">=</span> <span class="n">SentenceTransformer</span><span class="p">(</span><span class="n">DEFAULT_TRANSFORMER_MODEL</span><span class="p">)</span>
+        <span class="n">loaded_keybert</span> <span class="o">=</span> <span class="n">KeyBERT</span><span class="p">(</span><span class="n">DEFAULT_TRANSFORMER_MODEL</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">get_repos</span><span class="p">(</span>
+        <span class="n">paper</span><span class="p">,</span>
+        <span class="n">loaded_keybert</span><span class="o">=</span><span class="n">loaded_keybert</span><span class="p">,</span>
+        <span class="n">loaded_sent_transformer</span><span class="o">=</span><span class="n">loaded_sent_transformer</span><span class="p">,</span>
+    <span class="p">)</span></div>
 </pre></div>
         </article>
       </div>

@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" />
 
     <meta name="generator" content="sphinx-5.3.0, furo 2022.09.29"/>
-        <title>papers_without_code.app.views - papers-without-code 0.1.dev1+gf813f4a documentation</title>
+        <title>papers_without_code.app.views - papers-without-code 0.1.dev1+gd8b4c3f documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?digest=d81277517bee4d6b0349d71bb2661d4890b5617c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css" />
@@ -123,7 +123,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../../index.html"><div class="brand">papers-without-code 0.1.dev1+gf813f4a documentation</div></a>
+      <a href="../../../index.html"><div class="brand">papers-without-code 0.1.dev1+gd8b4c3f documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -146,7 +146,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../../index.html">
   
   
-  <span class="sidebar-brand-text">papers-without-code 0.1.dev1+gf813f4a documentation</span>
+  <span class="sidebar-brand-text">papers-without-code 0.1.dev1+gd8b4c3f documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../../search.html" role="search">
   <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
@@ -204,7 +204,6 @@
 <span></span><span class="ch">#!/usr/bin/env python</span>
 <span class="c1"># -*- coding: utf-8 -*-</span>
 
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 
 <span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">Blueprint</span><span class="p">,</span>
@@ -218,12 +217,8 @@
     <span class="n">url_for</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="kn">from</span> <span class="nn">..search</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">DEFAULT_LOCAL_CACHE_MODEL</span><span class="p">,</span>
-    <span class="n">DEFAULT_TRANSFORMER_MODEL</span><span class="p">,</span>
-    <span class="n">get_paper</span><span class="p">,</span>
-    <span class="n">get_repos</span><span class="p">,</span>
-<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">..search</span> <span class="kn">import</span> <span class="n">get_paper</span>
+<span class="kn">from</span> <span class="nn">..search</span> <span class="kn">import</span> <span class="n">search</span> <span class="k">as</span> <span class="n">paper_search</span>
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">TEMPLATES_DIR</span>
 
 <span class="c1">###############################################################################</span>
@@ -298,9 +293,6 @@
 
 <div class="viewcode-block" id="process"><a class="viewcode-back" href="../../../papers_without_code.app.html#papers_without_code.app.views.process">[docs]</a><span class="nd">@views</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s2">&quot;/process&quot;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;POST&quot;</span><span class="p">])</span>
 <span class="k">def</span> <span class="nf">process</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Response</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">keybert</span> <span class="kn">import</span> <span class="n">KeyBERT</span>
-    <span class="kn">from</span> <span class="nn">sentence_transformers</span> <span class="kn">import</span> <span class="n">SentenceTransformer</span>
-
     <span class="n">content_type</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Content-Type&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">content_type</span> <span class="o">!=</span> <span class="s2">&quot;application/json&quot;</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">make_response</span><span class="p">(</span><span class="s2">&quot;Content-Type not supported!&quot;</span><span class="p">)</span>
@@ -311,26 +303,11 @@
     <span class="k">if</span> <span class="ow">not</span> <span class="n">query</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">make_response</span><span class="p">(</span><span class="s2">&quot;must provide query body parameter&quot;</span><span class="p">)</span>
 
-    <span class="c1"># Return to normal DOI</span>
-    <span class="n">paper</span> <span class="o">=</span> <span class="n">get_paper</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+    <span class="c1"># Run search</span>
+    <span class="n">all_repo_details</span> <span class="o">=</span> <span class="n">paper_search</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
 
-    <span class="c1"># Preload models</span>
-    <span class="n">potential_cache_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">DEFAULT_LOCAL_CACHE_MODEL</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
-    <span class="k">if</span> <span class="n">potential_cache_dir</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-        <span class="n">loaded_sent_transformer</span> <span class="o">=</span> <span class="n">SentenceTransformer</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">potential_cache_dir</span><span class="p">))</span>
-        <span class="n">loaded_keybert</span> <span class="o">=</span> <span class="n">KeyBERT</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">potential_cache_dir</span><span class="p">))</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">loaded_sent_transformer</span> <span class="o">=</span> <span class="n">SentenceTransformer</span><span class="p">(</span><span class="n">DEFAULT_TRANSFORMER_MODEL</span><span class="p">)</span>
-        <span class="n">loaded_keybert</span> <span class="o">=</span> <span class="n">KeyBERT</span><span class="p">(</span><span class="n">DEFAULT_TRANSFORMER_MODEL</span><span class="p">)</span>
-
-    <span class="n">all_repo_details</span> <span class="o">=</span> <span class="n">get_repos</span><span class="p">(</span>
-        <span class="n">paper</span><span class="p">,</span>
-        <span class="n">loaded_keybert</span><span class="o">=</span><span class="n">loaded_keybert</span><span class="p">,</span>
-        <span class="n">loaded_sent_transformer</span><span class="o">=</span><span class="n">loaded_sent_transformer</span><span class="p">,</span>
-    <span class="p">)</span>
-
+    <span class="c1"># Return as JSON</span>
     <span class="n">repos</span> <span class="o">=</span> <span class="p">[</span><span class="n">repo_details</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span> <span class="k">for</span> <span class="n">repo_details</span> <span class="ow">in</span> <span class="n">all_repo_details</span><span class="p">]</span>
-    <span class="c1"># return make_response(jsonify({&quot;paper-title&quot;: paper.title}), 200)</span>
     <span class="k">return</span> <span class="n">make_response</span><span class="p">(</span><span class="n">jsonify</span><span class="p">(</span><span class="n">repos</span><span class="p">))</span></div>
 </pre></div>
         </article>
