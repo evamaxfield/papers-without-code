@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Installation" href="installation.html" />
 
     <!-- Generated with Sphinx 5.3.0 and Furo 2022.12.07 -->
-        <title>papers-without-code 0.1.dev1+g12beedc documentation</title>
+        <title>papers-without-code 0.1.dev1+gdab08d0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=91d0f0d1c444bdcb17a68e833c7a53903343c195" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
@@ -124,7 +124,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="#"><div class="brand">papers-without-code 0.1.dev1+g12beedc documentation</div></a>
+      <a href="#"><div class="brand">papers-without-code 0.1.dev1+gdab08d0 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -147,7 +147,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="#">
   
   
-  <span class="sidebar-brand-text">papers-without-code 0.1.dev1+g12beedc documentation</span>
+  <span class="sidebar-brand-text">papers-without-code 0.1.dev1+gdab08d0 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -211,7 +211,8 @@
 <h1>papers-without-code<a class="headerlink" href="#papers-without-code" title="Permalink to this heading">#</a></h1>
 <a class="reference external image-reference" href="https://github.com/evamaxfield/papers-without-code/actions"><img alt="Build Status" src="https://github.com/evamaxfield/papers-without-code/workflows/CI/badge.svg" /></a>
 <a class="reference external image-reference" href="https://evamaxfield.github.io/papers-without-code"><img alt="Python Package Documentation" src="https://github.com/evamaxfield/papers-without-code/workflows/Documentation/badge.svg" /></a>
-<p>A Python package (<a class="reference external" href="https://paperswithoutcode.org">and website</a>) to automatically attempt to find the code associated with a paper.</p>
+<p>A Python package (<a class="reference external" href="https://paperswithoutcode.org">and website</a>) to automatically attempt to find GitHub
+repositories that are similar to academic papers.</p>
 <a class="reference external image-reference" href="https://paperswithoutcode.org"><img alt="Image of the Papers without Code web application homepage" src="https://raw.githubusercontent.com/evamaxfield/papers-without-code/main/docs/_static/web-landing.png" /></a>
 <hr class="docutils" />
 <section id="installation">
@@ -219,16 +220,25 @@
 <p><strong>Stable Release:</strong> <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">papers-without-code</span></code><span class="raw-html-m2r"><br></span>
 <strong>Development Head:</strong> <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">git+https://github.com/evamaxfield/papers-without-code.git</span></code></p>
 </section>
-<section id="python-library">
-<h2>Python Library<a class="headerlink" href="#python-library" title="Permalink to this heading">#</a></h2>
-<p>From the terminal:</p>
+<section id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this heading">#</a></h2>
+<p>Provide a DOI, SemanticScholarID, CorpusID, ArXivID, ACL,
+or URL from semanticscholar.org, arxiv.org, aclweb.org,
+acm.org, or biorxiv.org. DOIs can be provided as is.
+All other IDs should be given with their type, for example:
+<code class="docutils literal notranslate"><span class="pre">doi:doi:10.18653/v1/2020.acl-main.447</span></code>
+or <code class="docutils literal notranslate"><span class="pre">CorpusID:202558505</span></code> or <code class="docutils literal notranslate"><span class="pre">url:https://arxiv.org/abs/2004.07180</span></code>.</p>
+<section id="cli">
+<h3>CLI<a class="headerlink" href="#cli" title="Permalink to this heading">#</a></h3>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install papers-without-code
 
 pwoc query
 <span class="c1"># or pwoc path/to/file.pdf</span>
 </pre></div>
 </div>
-<p>Or in Python:</p>
+</section>
+<section id="python">
+<h3>Python<a class="headerlink" href="#python" title="Permalink to this heading">#</a></h3>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">papers_without_code</span> <span class="kn">import</span> <span class="n">search_for_repos</span>
 
 <span class="n">search_for_repos</span><span class="p">(</span><span class="s2">&quot;query&quot;</span><span class="p">)</span>
@@ -237,6 +247,22 @@ pwoc query
 </div>
 <p>⚠️ Prior to using PWOC with a PDF you must be logged in to Docker CLI via <code class="docutils literal notranslate"><span class="pre">docker</span> <span class="pre">login</span></code>
 because we automatically fetch, spin up, and tear down containers for processing. ⚠️</p>
+</section>
+</section>
+<section id="how-it-works">
+<h2>How it Works<a class="headerlink" href="#how-it-works" title="Permalink to this heading">#</a></h2>
+<p>In short, we pass the query on to the Semantic Scholar search service
+(wrapped by <a class="reference external" href="https://github.com/danielnsilva/semanticscholar">danielnsilva/semanticscholar</a>)
+which provides us basic details about the paper. We then use
+<a class="reference external" href="https://github.com/MaartenGr/KeyBERT">KeyBERT</a> to extract keywords from the paper
+title and abstract. We then make multiple threaded requests to GitHub’s API
+for repositories which match the keywords. Once we have all the possible repositories
+back, we rank them by similarity between the repository’s README and the paper’s
+abstract (or if not available, it’s title).</p>
+<p>When using Papers without Code locally and providing a filepath, the only change to
+the system is that we get keywords not only from the paper’s title and abstract but
+additionally, we use <a class="reference external" href="https://github.com/kermitt2/grobid">GROBID</a> to extract
+all text from the paper and then extract keywords from the full text as well.</p>
 </section>
 <section id="documentation">
 <h2>Documentation<a class="headerlink" href="#documentation" title="Permalink to this heading">#</a></h2>
