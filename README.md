@@ -21,7 +21,7 @@ Provide a DOI, SemanticScholarID, CorpusID, ArXivID, ACL,
 or URL from semanticscholar.org, arxiv.org, aclweb.org,
 acm.org, or biorxiv.org. DOIs can be provided as is.
 All other IDs should be given with their type, for example:
-`doi:doi:10.18653/v1/2020.acl-main.447`
+`doi:10.18653/v1/2020.acl-main.447`
 or `CorpusID:202558505` or `url:https://arxiv.org/abs/2004.07180`.
 
 ### CLI
