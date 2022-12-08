@@ -14580,7 +14580,7 @@ body[data-format='mobile'] .jp-OutputArea-child .jp-OutputArea-output {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h1 id="Minor-EDA-on-Partially-Annotated-Data">Minor EDA on Partially Annotated Data<a class="anchor-link" href="#Minor-EDA-on-Partially-Annotated-Data">&#182;</a></h1>
+<h1 id="Papers-without-Code-EDA-and-Benchmarking">Papers without Code EDA and Benchmarking<a class="anchor-link" href="#Papers-without-Code-EDA-and-Benchmarking">&#182;</a></h1>
 </div>
 </div>
 </div>
@@ -14591,7 +14591,7 @@ body[data-format='mobile'] .jp-OutputArea-child .jp-OutputArea-output {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>This is some very very minimal exploratory data analysis on the dataset constructed for testing papers-without-code. The purpose is to quantify "what proportion of papers likely use code for their paper but do not link to it in anyway?"</p>
+<p>Very minimal exploratory data analysis on the dataset constructed for testing <code>papers-without-code</code>. The purpose is to quantify "what proportion of papers likely use code for their paper but do not link to it in anyway?" Then, analysis on how the package performs.</p>
 <p>You can read about the dataset construction on the <a href="./README.md">data README</a>.</p>
 
 </div>
@@ -14610,7 +14610,7 @@ body[data-format='mobile'] .jp-OutputArea-child .jp-OutputArea-output {
 <span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
 <span class="n">sns</span><span class="o">.</span><span class="n">set_theme</span><span class="p">(</span><span class="n">style</span><span class="o">=</span><span class="s2">"whitegrid"</span><span class="p">)</span>
 
-<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">"annotated.csv"</span><span class="p">)</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">"annotated.csv"</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="p">{</span><span class="s2">"id"</span><span class="p">:</span> <span class="nb">str</span><span class="p">})</span>
 
 <span class="c1"># We have only annotated 25 so far</span>
 <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[:</span><span class="mi">25</span><span class="p">]</span>
@@ -15044,6 +15044,323 @@ class="
 
 </div>
 
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<h2 id="%22How-many-repositories-can-we-find-with-our-automated-methods?%22">"How many repositories can we find with our automated methods?"<a class="anchor-link" href="#%22How-many-repositories-can-we-find-with-our-automated-methods?%22">&#182;</a></h2><p>Using the automated search, we only found four repositories that exactly match the ones the paper used for their method or analysis. Of those four, they all came from papers which provided links to their repository in their own paper, but, we didn't even find the fifth paper that did this. We also didn't find any of the repositories which we manually found repositories for.</p>
+<p><em>The web application uses the same code as the Python package so we can do this analysis in this notebook.</em></p>
+
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[7]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Get dataframe with just the papers where we manually found code</span>
+<span class="n">code_found</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">code_found</span><span class="p">]</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[8]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">papers_without_code</span> <span class="kn">import</span> <span class="n">search_for_repos</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+
+<span class="c1"># Attempt to find repos for each paper and sort their results</span>
+<span class="n">matching_results_benchmark_rows</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">code_found</span><span class="o">.</span><span class="n">iterrows</span><span class="p">()):</span>
+    <span class="c1"># Prepend the search with arxiv</span>
+    <span class="n">paper_repo_results</span> <span class="o">=</span> <span class="n">search_for_repos</span><span class="p">(</span><span class="sa">f</span><span class="s2">"arxiv:</span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+
+    <span class="c1"># Check all results</span>
+    <span class="n">found_match</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">match_category</span> <span class="o">=</span> <span class="s2">""</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">repo</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">paper_repo_results</span><span class="p">):</span>
+        <span class="c1"># Check for match</span>
+        <span class="k">if</span> <span class="n">repo</span><span class="o">.</span><span class="n">link</span> <span class="o">==</span> <span class="n">row</span><span class="o">.</span><span class="n">code_repository_link</span><span class="p">:</span>
+            <span class="n">found_match</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">match_category</span> <span class="o">=</span> <span class="s2">"first"</span>
+            <span class="k">elif</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="n">match_category</span> <span class="o">=</span> <span class="s2">"top three"</span>
+            <span class="k">elif</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">5</span><span class="p">:</span>
+                <span class="n">match_category</span> <span class="o">=</span> <span class="s2">"top five"</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">match_category</span> <span class="o">=</span> <span class="s2">"after top five"</span>
+
+            <span class="c1"># Break out and finish up this paper</span>
+            <span class="k">break</span>
+
+    <span class="c1"># Update row with info</span>
+    <span class="k">if</span> <span class="n">found_match</span><span class="p">:</span>
+        <span class="n">row</span><span class="p">[</span><span class="s2">"match"</span><span class="p">]</span> <span class="o">=</span> <span class="n">match_category</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">row</span><span class="p">[</span><span class="s2">"match"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"not found"</span>
+
+    <span class="c1"># Add row to new dataframe</span>
+    <span class="n">matching_results_benchmark_rows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+    
+<span class="n">matching_results_benchmark</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">matching_results_benchmark_rows</span><span class="p">)</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+
+
+<div class="jp-OutputArea jp-Cell-outputArea">
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+
+
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr">
+<pre>/opt/hostedtoolcache/Python/3.10.8/x64/lib/python3.10/site-packages/tqdm/auto.py:22: TqdmWarning: IProgress not found. Please update jupyter and ipywidgets. See https://ipywidgets.readthedocs.io/en/stable/user_install.html
+  from .autonotebook import tqdm as notebook_tqdm
+0it [00:00, ?it/s]
+Downloading: 100%|██████████| 690/690 [00:00&lt;00:00, 547kB/s]
+
+Downloading: 100%|██████████| 190/190 [00:00&lt;00:00, 154kB/s]
+
+Downloading: 100%|██████████| 2.71k/2.71k [00:00&lt;00:00, 2.69MB/s]
+
+Downloading: 100%|██████████| 622/622 [00:00&lt;00:00, 288kB/s]
+
+Downloading: 100%|██████████| 122/122 [00:00&lt;00:00, 80.4kB/s]
+
+Downloading:   0%|          | 0.00/440M [00:00&lt;?, ?B/s]
+Downloading:   2%|▏         | 6.64M/440M [00:00&lt;00:06, 66.4MB/s]
+Downloading:   3%|▎         | 14.8M/440M [00:00&lt;00:05, 75.0MB/s]
+Downloading:   5%|▌         | 23.8M/440M [00:00&lt;00:05, 82.0MB/s]
+Downloading:   7%|▋         | 32.0M/440M [00:00&lt;00:05, 81.3MB/s]
+Downloading:  10%|▉         | 42.1M/440M [00:00&lt;00:04, 88.3MB/s]
+Downloading:  12%|█▏        | 52.3M/440M [00:00&lt;00:04, 93.3MB/s]
+Downloading:  14%|█▍        | 61.7M/440M [00:00&lt;00:04, 84.1MB/s]
+Downloading:  16%|█▋        | 71.6M/440M [00:00&lt;00:04, 88.6MB/s]
+Downloading:  19%|█▊        | 81.9M/440M [00:00&lt;00:03, 92.9MB/s]
+Downloading:  21%|██        | 92.0M/440M [00:01&lt;00:03, 95.2MB/s]
+Downloading:  23%|██▎       | 102M/440M [00:01&lt;00:03, 94.2MB/s] 
+Downloading:  25%|██▌       | 111M/440M [00:01&lt;00:03, 85.8MB/s]
+Downloading:  27%|██▋       | 120M/440M [00:01&lt;00:04, 77.4MB/s]
+Downloading:  29%|██▉       | 129M/440M [00:01&lt;00:03, 81.5MB/s]
+Downloading:  31%|███▏      | 138M/440M [00:01&lt;00:03, 76.7MB/s]
+Downloading:  33%|███▎      | 147M/440M [00:01&lt;00:03, 80.2MB/s]
+Downloading:  36%|███▌      | 157M/440M [00:01&lt;00:03, 85.9MB/s]
+Downloading:  38%|███▊      | 166M/440M [00:01&lt;00:03, 87.5MB/s]
+Downloading:  40%|███▉      | 175M/440M [00:02&lt;00:03, 88.3MB/s]
+Downloading:  42%|████▏     | 184M/440M [00:02&lt;00:02, 89.3MB/s]
+Downloading:  44%|████▍     | 194M/440M [00:02&lt;00:02, 92.9MB/s]
+Downloading:  46%|████▋     | 203M/440M [00:02&lt;00:02, 92.3MB/s]
+Downloading:  48%|████▊     | 213M/440M [00:02&lt;00:02, 93.9MB/s]
+Downloading:  51%|█████     | 223M/440M [00:02&lt;00:03, 71.6MB/s]
+Downloading:  52%|█████▏    | 231M/440M [00:02&lt;00:03, 54.1MB/s]
+Downloading:  55%|█████▍    | 240M/440M [00:02&lt;00:03, 61.7MB/s]
+Downloading:  56%|█████▌    | 247M/440M [00:03&lt;00:03, 60.9MB/s]
+Downloading:  59%|█████▊    | 257M/440M [00:03&lt;00:02, 70.7MB/s]
+Downloading:  61%|██████    | 267M/440M [00:03&lt;00:02, 78.0MB/s]
+Downloading:  63%|██████▎   | 276M/440M [00:03&lt;00:02, 81.1MB/s]
+Downloading:  65%|██████▍   | 286M/440M [00:03&lt;00:01, 84.1MB/s]
+Downloading:  67%|██████▋   | 296M/440M [00:03&lt;00:01, 89.0MB/s]
+Downloading:  70%|██████▉   | 306M/440M [00:03&lt;00:01, 92.8MB/s]
+Downloading:  72%|███████▏  | 315M/440M [00:03&lt;00:01, 92.2MB/s]
+Downloading:  74%|███████▍  | 325M/440M [00:03&lt;00:01, 92.4MB/s]
+Downloading:  76%|███████▌  | 334M/440M [00:04&lt;00:01, 92.2MB/s]
+Downloading:  78%|███████▊  | 344M/440M [00:04&lt;00:01, 85.6MB/s]
+Downloading:  80%|████████  | 352M/440M [00:04&lt;00:01, 67.8MB/s]
+Downloading:  82%|████████▏ | 360M/440M [00:04&lt;00:01, 57.4MB/s]
+Downloading:  83%|████████▎ | 366M/440M [00:04&lt;00:01, 57.6MB/s]
+Downloading:  85%|████████▌ | 375M/440M [00:04&lt;00:00, 65.5MB/s]
+Downloading:  87%|████████▋ | 384M/440M [00:04&lt;00:00, 71.2MB/s]
+Downloading:  90%|████████▉ | 394M/440M [00:04&lt;00:00, 79.2MB/s]
+Downloading:  92%|█████████▏| 403M/440M [00:05&lt;00:00, 82.5MB/s]
+Downloading:  94%|█████████▎| 412M/440M [00:05&lt;00:00, 72.1MB/s]
+Downloading:  96%|█████████▌| 421M/440M [00:05&lt;00:00, 76.5MB/s]
+Downloading:  98%|█████████▊| 430M/440M [00:05&lt;00:00, 80.2MB/s]
+Downloading: 100%|██████████| 440M/440M [00:05&lt;00:00, 79.7MB/s]
+
+Downloading: 100%|██████████| 53.0/53.0 [00:00&lt;00:00, 36.1kB/s]
+
+Downloading: 100%|██████████| 112/112 [00:00&lt;00:00, 96.1kB/s]
+
+Downloading: 100%|██████████| 462k/462k [00:00&lt;00:00, 14.4MB/s]
+
+Downloading: 100%|██████████| 331/331 [00:00&lt;00:00, 233kB/s]
+
+Downloading: 100%|██████████| 222k/222k [00:00&lt;00:00, 8.71MB/s]
+
+Downloading: 100%|██████████| 229/229 [00:00&lt;00:00, 204kB/s]
+/opt/hostedtoolcache/Python/3.10.8/x64/lib/python3.10/site-packages/ghapi/core.py:101: UserWarning: Neither GITHUB_TOKEN nor GITHUB_JWT_TOKEN found: running as unauthenticated
+  else: warn(&#39;Neither GITHUB_TOKEN nor GITHUB_JWT_TOKEN found: running as unauthenticated&#39;)
+1it [00:26, 26.52s/it]/opt/hostedtoolcache/Python/3.10.8/x64/lib/python3.10/site-packages/ghapi/core.py:101: UserWarning: Neither GITHUB_TOKEN nor GITHUB_JWT_TOKEN found: running as unauthenticated
+  else: warn(&#39;Neither GITHUB_TOKEN nor GITHUB_JWT_TOKEN found: running as unauthenticated&#39;)
+2it [02:02, 67.67s/it]/opt/hostedtoolcache/Python/3.10.8/x64/lib/python3.10/site-packages/ghapi/core.py:101: UserWarning: Neither GITHUB_TOKEN nor GITHUB_JWT_TOKEN found: running as unauthenticated
+  else: warn(&#39;Neither GITHUB_TOKEN nor GITHUB_JWT_TOKEN found: running as unauthenticated&#39;)
+3it [02:33, 50.56s/it]/opt/hostedtoolcache/Python/3.10.8/x64/lib/python3.10/site-packages/ghapi/core.py:101: UserWarning: Neither GITHUB_TOKEN nor GITHUB_JWT_TOKEN found: running as unauthenticated
+  else: warn(&#39;Neither GITHUB_TOKEN nor GITHUB_JWT_TOKEN found: running as unauthenticated&#39;)
+4it [04:54, 86.31s/it]/opt/hostedtoolcache/Python/3.10.8/x64/lib/python3.10/site-packages/ghapi/core.py:101: UserWarning: Neither GITHUB_TOKEN nor GITHUB_JWT_TOKEN found: running as unauthenticated
+  else: warn(&#39;Neither GITHUB_TOKEN nor GITHUB_JWT_TOKEN found: running as unauthenticated&#39;)
+5it [04:57, 56.36s/it]/opt/hostedtoolcache/Python/3.10.8/x64/lib/python3.10/site-packages/ghapi/core.py:101: UserWarning: Neither GITHUB_TOKEN nor GITHUB_JWT_TOKEN found: running as unauthenticated
+  else: warn(&#39;Neither GITHUB_TOKEN nor GITHUB_JWT_TOKEN found: running as unauthenticated&#39;)
+6it [07:22, 86.64s/it]/opt/hostedtoolcache/Python/3.10.8/x64/lib/python3.10/site-packages/ghapi/core.py:101: UserWarning: Neither GITHUB_TOKEN nor GITHUB_JWT_TOKEN found: running as unauthenticated
+  else: warn(&#39;Neither GITHUB_TOKEN nor GITHUB_JWT_TOKEN found: running as unauthenticated&#39;)
+7it [09:14, 94.78s/it]/opt/hostedtoolcache/Python/3.10.8/x64/lib/python3.10/site-packages/ghapi/core.py:101: UserWarning: Neither GITHUB_TOKEN nor GITHUB_JWT_TOKEN found: running as unauthenticated
+  else: warn(&#39;Neither GITHUB_TOKEN nor GITHUB_JWT_TOKEN found: running as unauthenticated&#39;)
+8it [09:26, 68.26s/it]/opt/hostedtoolcache/Python/3.10.8/x64/lib/python3.10/site-packages/ghapi/core.py:101: UserWarning: Neither GITHUB_TOKEN nor GITHUB_JWT_TOKEN found: running as unauthenticated
+  else: warn(&#39;Neither GITHUB_TOKEN nor GITHUB_JWT_TOKEN found: running as unauthenticated&#39;)
+9it [10:48, 72.79s/it]/opt/hostedtoolcache/Python/3.10.8/x64/lib/python3.10/site-packages/ghapi/core.py:101: UserWarning: Neither GITHUB_TOKEN nor GITHUB_JWT_TOKEN found: running as unauthenticated
+  else: warn(&#39;Neither GITHUB_TOKEN nor GITHUB_JWT_TOKEN found: running as unauthenticated&#39;)
+10it [11:23, 60.95s/it]/opt/hostedtoolcache/Python/3.10.8/x64/lib/python3.10/site-packages/ghapi/core.py:101: UserWarning: Neither GITHUB_TOKEN nor GITHUB_JWT_TOKEN found: running as unauthenticated
+  else: warn(&#39;Neither GITHUB_TOKEN nor GITHUB_JWT_TOKEN found: running as unauthenticated&#39;)
+11it [13:09, 74.83s/it]/opt/hostedtoolcache/Python/3.10.8/x64/lib/python3.10/site-packages/ghapi/core.py:101: UserWarning: Neither GITHUB_TOKEN nor GITHUB_JWT_TOKEN found: running as unauthenticated
+  else: warn(&#39;Neither GITHUB_TOKEN nor GITHUB_JWT_TOKEN found: running as unauthenticated&#39;)
+12it [13:15, 53.92s/it]/opt/hostedtoolcache/Python/3.10.8/x64/lib/python3.10/site-packages/ghapi/core.py:101: UserWarning: Neither GITHUB_TOKEN nor GITHUB_JWT_TOKEN found: running as unauthenticated
+  else: warn(&#39;Neither GITHUB_TOKEN nor GITHUB_JWT_TOKEN found: running as unauthenticated&#39;)
+13it [15:08, 69.87s/it]
+</pre>
+</div>
+</div>
+
+</div>
+
+</div>
+
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[9]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">matching_results_benchmark</span><span class="p">[</span>
+    <span class="n">matching_results_benchmark</span><span class="o">.</span><span class="n">match</span> <span class="o">!=</span> <span class="s2">"not found"</span>
+<span class="p">][[</span><span class="s2">"id"</span><span class="p">,</span> <span class="s2">"code_repository_linked_in_paper"</span><span class="p">,</span> <span class="s2">"match"</span><span class="p">]]</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+
+
+<div class="jp-OutputArea jp-Cell-outputArea">
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[9]:</div>
+
+
+
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>id</th>
+      <th>code_repository_linked_in_paper</th>
+      <th>match</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>5</th>
+      <td>2202.13538</td>
+      <td>yes</td>
+      <td>first</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>2111.14338</td>
+      <td>yes</td>
+      <td>first</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>2003.01479</td>
+      <td>yes</td>
+      <td>first</td>
+    </tr>
+    <tr>
+      <th>19</th>
+      <td>2110.05877</td>
+      <td>yes</td>
+      <td>first</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<h2 id="Takeaways">Takeaways<a class="anchor-link" href="#Takeaways">&#182;</a></h2><h3 id="The-Bad">The Bad<a class="anchor-link" href="#The-Bad">&#182;</a></h3><p>Our search isn't that great at finding the <em>exact</em> matching repository to the paper. I think a large portion of the failure comes because of two things:</p>
+<ol>
+<li><p>GitHub's API has an incredibly strict rate limit. In order to make the search work efficiently, I am using repository searches and not "code searches". By looking at the tqdm average from the prior processing cell, we can see that on average searches were completed in ~20 seconds. This is the tradeoff I had to make.</p>
+</li>
+<li><p>If you look at my original annotation data, I left notes as to how I found multiple of the repositories. In many cases I was searching for one of the paper authors GitHub profile and then looking at only their repositories. In this current search, we are just doing keyword searches across all repositories.</p>
+</li>
+</ol>
+<h3 id="The-Good">The Good<a class="anchor-link" href="#The-Good">&#182;</a></h3><p>It isn't all for waste in my opinion though. While the original intent was to find GitHub repositories which are the exact match for a paper, we are able to find repositories that are similar or may still be useful to the user. I don't have any qualitative data to back this up but from my own experiences, I have found repositories related to my own research that I have never seen before but are incredibly relevent.</p>
+
+</div>
+</div>
+</div>
 </div>
 </body>
 
