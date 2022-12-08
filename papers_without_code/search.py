@@ -57,7 +57,7 @@ def get_paper(query: str) -> Paper:
         No paper was found.
     """
     api = SemanticScholar()
-    paper = api.get_paper(query)
+    paper = api.get_paper(query.strip())
 
     # Handle no paper found
     if len(paper.raw_data) == 0:
