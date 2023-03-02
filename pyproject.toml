@@ -35,7 +35,7 @@ dependencies = [
   "keybert~=0.7",
   "python-dotenv~=0.21.0",
   "requests~=2.28",
-  "semanticscholar~=0.3",
+  "semanticscholar==0.3.2",
   "sentence-transformers~=2.2",
 ]
 

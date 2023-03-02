@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import itertools
+import logging
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from functools import partial
@@ -21,6 +22,10 @@ from semanticscholar import Paper, SemanticScholar
 from sentence_transformers import SentenceTransformer, util
 
 from .custom_types import MinimalPaperDetails
+
+###############################################################################
+
+log = logging.getLogger(__name__)
 
 ###############################################################################
 
@@ -56,8 +61,10 @@ def get_paper(query: str) -> Paper:
     ValueErorr
         No paper was found.
     """
-    api = SemanticScholar()
-    paper = api.get_paper(query.strip())
+    api = SemanticScholar(timeout=20, graph_api=False)
+    log.info(f"Getting SemanticScholar paper details with query: '{query}'")
+    paper = api.get_paper(query.strip(), fields=["title, authors, abstract"])
+    log.info(f"Found SemanticScholar paper with query: '{query}'")
 
     # Handle no paper found
     if len(paper.raw_data) == 0:

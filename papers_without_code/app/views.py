@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import logging
+
 from flask import (
     Blueprint,
     Request,
@@ -16,6 +18,10 @@ from flask import (
 from .. import search_for_repos
 from ..search import get_paper
 from . import TEMPLATES_DIR
+
+###############################################################################
+
+log = logging.getLogger(__name__)
 
 ###############################################################################
 
@@ -76,7 +82,10 @@ def search(q: str) -> str:
         paper_details = get_paper(query)
 
     # Handle no paper found with DOI
-    except Exception:
+    except Exception as e:
+        log.error(
+            f"Something went wrong during Semantic Scholar paper retrieval: '{e}'"
+        )
         return redirect(url_for("views.not_found"))
 
     return render_template(
