@@ -26,5 +26,6 @@ class MinimalPaperDetails:
     title: str
     authors: List[AuthorDetails]
     abstract: str
+    url: Optional[str] = None
     keywords: Optional[List[Tuple[str, float]]] = None
     other: Optional[Dict[str, Any]] = None

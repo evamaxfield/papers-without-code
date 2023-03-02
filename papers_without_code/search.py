@@ -17,7 +17,6 @@ from fastcore.net import HTTP4xxClientError
 from ghapi.all import GhApi
 from keybert import KeyBERT
 from requests.exceptions import HTTPError
-from semanticscholar import Paper, SemanticScholar
 from sentence_transformers import SentenceTransformer, util
 
 from .custom_types import MinimalPaperDetails
@@ -34,7 +33,7 @@ DEFAULT_LOCAL_CACHE_MODEL = f"./sentence-transformers_{DEFAULT_TRANSFORMER_MODEL
 ###############################################################################
 
 
-def get_paper(query: str) -> Paper:
+def get_paper(query: str) -> MinimalPaperDetails:
     """
     Get a papers details from the Semantic Scholar API.
 
@@ -60,21 +59,26 @@ def get_paper(query: str) -> Paper:
     ValueErorr
         No paper was found.
     """
-    api = SemanticScholar(timeout=20, graph_api=False)
     log.info(f"Getting SemanticScholar paper details with query: '{query}'")
-    paper = api.get_paper(query.strip(), fields=["title, authors, abstract"])
+    response = requests.get(
+        f"https://api.semanticscholar.org/graph/v1/paper/{query.strip()}"
+    )
+    response.raise_for_status()
+    response_data = response.json()
+    log.info(response_data)
     log.info(f"Found SemanticScholar paper with query: '{query}'")
 
     # Handle no paper found
-    if len(paper.raw_data) == 0:
+    if len(response_data) == 0:
         raise ValueError(f"No paper found with DOI: '{query}'")
 
     return MinimalPaperDetails(
-        title=paper.title,
-        authors=paper.authors,
-        abstract=paper.abstract,
+        url=f"https://www.semanticscholar.org/paper/{response_data['paperId']}",
+        title=response_data.get("title"),
+        authors=response_data.get("authors", None),
+        abstract=response_data.get("abstract", None),
         keywords=None,
-        other={"full_semantic_scholar_data": paper},
+        other={"full_semantic_scholar_data": response_data},
     )
 
 
@@ -213,7 +217,7 @@ class RepoDetails(DataClassJsonMixin):
 
 def _semantic_sim_repos(
     all_repos_details: List[RepoReadmeResponse],
-    paper: Paper,
+    paper: MinimalPaperDetails,
     model: Optional[SentenceTransformer] = None,
 ) -> List[RepoDetails]:
     # Load model

@@ -91,7 +91,7 @@ def search(q: str) -> str:
         "search-success.html",
         query=query,
         title=paper_details.title,
-        paper_url=paper_details.other["full_semantic_scholar_data"].url,
+        paper_url=paper_details.url,
     )
 
 
