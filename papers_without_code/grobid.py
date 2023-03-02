@@ -1,11 +1,10 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 import logging
 import os
 import time
 from pathlib import Path
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Dict, Optional, Tuple, Union
 
 import docker
 import requests
@@ -22,14 +21,15 @@ log = logging.getLogger(__name__)
 
 DEFAULT_GROBID_IMAGE = "lfoppiano/grobid:0.7.2"
 DEFAULT_GROBID_PORT = 8070
+DEFAULT_GROBID_CLIENT_KWS = {"timeout": 120}
 
 ###############################################################################
 
 
-def setup_or_connect_to_server(
+def setup_or_connect_to_server(  # noqa: C901
     image: Optional[str] = None,
     port: Optional[int] = None,
-    grobid_client_kws: Dict[str, Any] = {"timeout": 120},
+    grobid_client_kws: Union[Dict[str, Any], None] = None,
 ) -> Tuple[Optional[GrobidClient], docker.models.containers.Container]:
     """
     Setup (or connect to) a GROBID server managed via a local Docker container.
@@ -70,6 +70,10 @@ def setup_or_connect_to_server(
             port = int(os.environ["GROBID_PORT"])
         else:
             port = DEFAULT_GROBID_PORT
+
+    # Handle default client kws
+    if not grobid_client_kws:
+        grobid_client_kws = DEFAULT_GROBID_CLIENT_KWS
 
     # Connect to Docker client
     docker_client = docker.from_env()

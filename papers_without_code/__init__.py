@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """Top-level package for papers_without_code."""
 
 import logging
@@ -47,10 +45,10 @@ def _get_paper_from_file(
                 "stopping and removing container."
             )
             grobid.teardown_server(container)
-            raise EnvironmentError()
+            raise OSError()
         else:
             log.error("Something went wrong during GROBID server setup.")
-            raise EnvironmentError()
+            raise OSError()
 
     # Process the PDF
     try:
@@ -62,10 +60,10 @@ def _get_paper_from_file(
                 f"stopping and removing container."
             )
             grobid.teardown_server(container)
-            raise EnvironmentError()
+            raise e
         else:
             log.error(f"Something went wrong during GROBID PDF parsing (Error: '{e}').")
-            raise EnvironmentError()
+            raise e
 
     # Shut down server
     # We don't need it anymore
@@ -103,6 +101,9 @@ def search_for_repos(
     ----------
     query_or_path: str
         The structured paper to query for or a path to a file to parse.
+    teardown: bool
+        Should the GROBID server be torn down after search is complete.
+        Default: False (do not tear down server)
 
     Returns
     -------

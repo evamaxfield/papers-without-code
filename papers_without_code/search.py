@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 import itertools
 import logging
@@ -125,19 +124,19 @@ def _search_repos(
         response = api(
             "/search/repositories",
             "GET",
-            query=dict(
-                q=f'"{query.query_str}"',
-                per_page=10,
-            ),
+            query={
+                "q": f'"{query.query_str}"',
+                "per_page": 10,
+            },
         )
     else:
         response = api(
             "/search/repositories",
             "GET",
-            query=dict(
-                q=f"{query.query_str}",
-                per_page=10,
-            ),
+            query={
+                "q": f"{query.query_str}",
+                "per_page": 10,
+            },
         )
 
     # Dedupe and process

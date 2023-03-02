@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """Web app support package for papers_without_code."""
 
 ###############################################################################
