@@ -4,8 +4,8 @@
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" />
 
-    <!-- Generated with Sphinx 6.0.0 and Furo 2022.12.07 -->
-        <title>papers_without_code.search - papers-without-code 0.1.dev1+g36f1c55 documentation</title>
+    <!-- Generated with Sphinx 6.1.3 and Furo 2022.12.07 -->
+        <title>papers_without_code.search - papers-without-code 0.1.dev1+g8c642d3 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?digest=91d0f0d1c444bdcb17a68e833c7a53903343c195" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
@@ -123,7 +123,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../index.html"><div class="brand">papers-without-code 0.1.dev1+g36f1c55 documentation</div></a>
+      <a href="../../index.html"><div class="brand">papers-without-code 0.1.dev1+g8c642d3 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -146,7 +146,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
   
   
-  <span class="sidebar-brand-text">papers-without-code 0.1.dev1+g36f1c55 documentation</span>
+  <span class="sidebar-brand-text">papers-without-code 0.1.dev1+g8c642d3 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -202,9 +202,9 @@
         <article role="main">
           <h1>Source code for papers_without_code.search</h1><div class="highlight"><pre>
 <span></span><span class="ch">#!/usr/bin/env python</span>
-<span class="c1"># -*- coding: utf-8 -*-</span>
 
 <span class="kn">import</span> <span class="nn">itertools</span>
+<span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">from</span> <span class="nn">concurrent.futures</span> <span class="kn">import</span> <span class="n">ThreadPoolExecutor</span>
 <span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
 <span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
@@ -220,10 +220,13 @@
 <span class="kn">from</span> <span class="nn">ghapi.all</span> <span class="kn">import</span> <span class="n">GhApi</span>
 <span class="kn">from</span> <span class="nn">keybert</span> <span class="kn">import</span> <span class="n">KeyBERT</span>
 <span class="kn">from</span> <span class="nn">requests.exceptions</span> <span class="kn">import</span> <span class="n">HTTPError</span>
-<span class="kn">from</span> <span class="nn">semanticscholar</span> <span class="kn">import</span> <span class="n">Paper</span><span class="p">,</span> <span class="n">SemanticScholar</span>
 <span class="kn">from</span> <span class="nn">sentence_transformers</span> <span class="kn">import</span> <span class="n">SentenceTransformer</span><span class="p">,</span> <span class="n">util</span>
 
 <span class="kn">from</span> <span class="nn">.custom_types</span> <span class="kn">import</span> <span class="n">MinimalPaperDetails</span>
+
+<span class="c1">###############################################################################</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 <span class="c1">###############################################################################</span>
 
@@ -233,7 +236,7 @@
 <span class="c1">###############################################################################</span>
 
 
-<div class="viewcode-block" id="get_paper"><a class="viewcode-back" href="../../papers_without_code.html#papers_without_code.search.get_paper">[docs]</a><span class="k">def</span> <span class="nf">get_paper</span><span class="p">(</span><span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Paper</span><span class="p">:</span>
+<div class="viewcode-block" id="get_paper"><a class="viewcode-back" href="../../papers_without_code.html#papers_without_code.search.get_paper">[docs]</a><span class="k">def</span> <span class="nf">get_paper</span><span class="p">(</span><span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MinimalPaperDetails</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get a papers details from the Semantic Scholar API.</span>
 
@@ -259,19 +262,26 @@
 <span class="sd">    ValueErorr</span>
 <span class="sd">        No paper was found.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">api</span> <span class="o">=</span> <span class="n">SemanticScholar</span><span class="p">()</span>
-    <span class="n">paper</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">get_paper</span><span class="p">(</span><span class="n">query</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Getting SemanticScholar paper details with query: &#39;</span><span class="si">{</span><span class="n">query</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;https://api.semanticscholar.org/graph/v1/paper/</span><span class="si">{</span><span class="n">query</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="p">)</span>
+    <span class="n">response</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
+    <span class="n">response_data</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">response_data</span><span class="p">)</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Found SemanticScholar paper with query: &#39;</span><span class="si">{</span><span class="n">query</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
 
     <span class="c1"># Handle no paper found</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">paper</span><span class="o">.</span><span class="n">raw_data</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">response_data</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No paper found with DOI: &#39;</span><span class="si">{</span><span class="n">query</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">MinimalPaperDetails</span><span class="p">(</span>
-        <span class="n">title</span><span class="o">=</span><span class="n">paper</span><span class="o">.</span><span class="n">title</span><span class="p">,</span>
-        <span class="n">authors</span><span class="o">=</span><span class="n">paper</span><span class="o">.</span><span class="n">authors</span><span class="p">,</span>
-        <span class="n">abstract</span><span class="o">=</span><span class="n">paper</span><span class="o">.</span><span class="n">abstract</span><span class="p">,</span>
+        <span class="n">url</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;https://www.semanticscholar.org/paper/</span><span class="si">{</span><span class="n">response_data</span><span class="p">[</span><span class="s1">&#39;paperId&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="n">title</span><span class="o">=</span><span class="n">response_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">),</span>
+        <span class="n">authors</span><span class="o">=</span><span class="n">response_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;authors&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+        <span class="n">abstract</span><span class="o">=</span><span class="n">response_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;abstract&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
         <span class="n">keywords</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">other</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;full_semantic_scholar_data&quot;</span><span class="p">:</span> <span class="n">paper</span><span class="p">},</span>
+        <span class="n">other</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;full_semantic_scholar_data&quot;</span><span class="p">:</span> <span class="n">response_data</span><span class="p">},</span>
     <span class="p">)</span></div>
 
 
@@ -321,19 +331,19 @@
         <span class="n">response</span> <span class="o">=</span> <span class="n">api</span><span class="p">(</span>
             <span class="s2">&quot;/search/repositories&quot;</span><span class="p">,</span>
             <span class="s2">&quot;GET&quot;</span><span class="p">,</span>
-            <span class="n">query</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
-                <span class="n">q</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;&quot;</span><span class="si">{</span><span class="n">query</span><span class="o">.</span><span class="n">query_str</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">,</span>
-                <span class="n">per_page</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
-            <span class="p">),</span>
+            <span class="n">query</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;q&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;&quot;</span><span class="si">{</span><span class="n">query</span><span class="o">.</span><span class="n">query_str</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">,</span>
+                <span class="s2">&quot;per_page&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
+            <span class="p">},</span>
         <span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">response</span> <span class="o">=</span> <span class="n">api</span><span class="p">(</span>
             <span class="s2">&quot;/search/repositories&quot;</span><span class="p">,</span>
             <span class="s2">&quot;GET&quot;</span><span class="p">,</span>
-            <span class="n">query</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
-                <span class="n">q</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">query</span><span class="o">.</span><span class="n">query_str</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
-                <span class="n">per_page</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
-            <span class="p">),</span>
+            <span class="n">query</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;q&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">query</span><span class="o">.</span><span class="n">query_str</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;per_page&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
+            <span class="p">},</span>
         <span class="p">)</span>
 
     <span class="c1"># Dedupe and process</span>
@@ -410,7 +420,7 @@
 
 <span class="k">def</span> <span class="nf">_semantic_sim_repos</span><span class="p">(</span>
     <span class="n">all_repos_details</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">RepoReadmeResponse</span><span class="p">],</span>
-    <span class="n">paper</span><span class="p">:</span> <span class="n">Paper</span><span class="p">,</span>
+    <span class="n">paper</span><span class="p">:</span> <span class="n">MinimalPaperDetails</span><span class="p">,</span>
     <span class="n">model</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">SentenceTransformer</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">RepoDetails</span><span class="p">]:</span>
     <span class="c1"># Load model</span>
