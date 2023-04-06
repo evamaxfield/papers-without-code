@@ -297,6 +297,12 @@ def get_repos(
     if not paper.keywords:
         # Get all the queries we want to run
         if paper.title:
+            title_subset = [
+                SearchQueryDataTracker(
+                    query_str=" ".join(paper.title.split(" ")[:3]),
+                    strict=True,
+                )
+            ]
             title_general_keywords = [
                 SearchQueryDataTracker(
                     query_str=word,
@@ -321,6 +327,7 @@ def get_repos(
                 )
             ]
         else:
+            title_subset = []
             title_general_keywords = []
             title_strict_keywords = []
 
@@ -354,6 +361,7 @@ def get_repos(
 
         # Reduce in case of duplicates
         all_query_datas = [
+            *title_subset,
             *title_general_keywords,
             *title_strict_keywords,
             *abstract_general_keywords,
@@ -398,6 +406,11 @@ def get_repos(
             )
             for word, _ in paper.keywords
         ]
+
+    # Progress info
+    log.info(
+        f"Searching GitHub for Paper: '{paper.title}'. Using queries: {set_queries}"
+    )
 
     # Create partial search func with API access already attached
     search_func = partial(_search_repos, api=api)
