@@ -4,10 +4,10 @@
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" />
 
-    <!-- Generated with Sphinx 6.1.3 and Furo 2022.12.07 -->
-        <title>papers_without_code.search - papers-without-code 0.1.dev1+g8c642d3 documentation</title>
+    <!-- Generated with Sphinx 6.1.3 and Furo 2023.03.27 -->
+        <title>papers_without_code.search - papers-without-code 0.1.dev1+g950a980 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?digest=91d0f0d1c444bdcb17a68e833c7a53903343c195" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?digest=fad236701ea90a88636c2a8c73b44ae642ed2a53" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
     
@@ -123,7 +123,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../index.html"><div class="brand">papers-without-code 0.1.dev1+g8c642d3 documentation</div></a>
+      <a href="../../index.html"><div class="brand">papers-without-code 0.1.dev1+g950a980 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -146,7 +146,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
   
   
-  <span class="sidebar-brand-text">papers-without-code 0.1.dev1+g8c642d3 documentation</span>
+  <span class="sidebar-brand-text">papers-without-code 0.1.dev1+g950a980 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -209,6 +209,7 @@
 <span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
 <span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">random</span> <span class="kn">import</span> <span class="n">sample</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
 
 <span class="kn">import</span> <span class="nn">backoff</span>
@@ -288,6 +289,8 @@
 <span class="k">def</span> <span class="nf">_get_keywords</span><span class="p">(</span>
     <span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">stop_words</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;english&quot;</span><span class="p">,</span>
+    <span class="n">keyphrase_ngram_range</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
+    <span class="n">top_n</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
     <span class="n">model</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">KeyBERT</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]:</span>
     <span class="c1"># Load model</span>
@@ -300,8 +303,8 @@
 
     <span class="k">return</span> <span class="n">model</span><span class="o">.</span><span class="n">extract_keywords</span><span class="p">(</span>
         <span class="n">text</span><span class="p">,</span>
-        <span class="n">keyphrase_ngram_range</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
-        <span class="n">top_n</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+        <span class="n">keyphrase_ngram_range</span><span class="o">=</span><span class="n">keyphrase_ngram_range</span><span class="p">,</span>
+        <span class="n">top_n</span><span class="o">=</span><span class="n">top_n</span><span class="p">,</span>
         <span class="n">stop_words</span><span class="o">=</span><span class="n">stop_words</span><span class="p">,</span>
     <span class="p">)</span>
 
@@ -497,7 +500,18 @@
     <span class="k">if</span> <span class="ow">not</span> <span class="n">paper</span><span class="o">.</span><span class="n">keywords</span><span class="p">:</span>
         <span class="c1"># Get all the queries we want to run</span>
         <span class="k">if</span> <span class="n">paper</span><span class="o">.</span><span class="n">title</span><span class="p">:</span>
-            <span class="n">title_keywords</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">title_general_keywords</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">SearchQueryDataTracker</span><span class="p">(</span>
+                    <span class="n">query_str</span><span class="o">=</span><span class="n">word</span><span class="p">,</span>
+                    <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="k">for</span> <span class="n">word</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">_get_keywords</span><span class="p">(</span>
+                    <span class="n">paper</span><span class="o">.</span><span class="n">title</span><span class="p">,</span>
+                    <span class="n">model</span><span class="o">=</span><span class="n">loaded_keybert</span><span class="p">,</span>
+                    <span class="c1"># stop_words=None,</span>
+                <span class="p">)</span>
+            <span class="p">]</span>
+            <span class="n">title_strict_keywords</span> <span class="o">=</span> <span class="p">[</span>
                 <span class="n">SearchQueryDataTracker</span><span class="p">(</span>
                     <span class="n">query_str</span><span class="o">=</span><span class="n">word</span><span class="p">,</span>
                     <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
@@ -505,14 +519,27 @@
                 <span class="k">for</span> <span class="n">word</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">_get_keywords</span><span class="p">(</span>
                     <span class="n">paper</span><span class="o">.</span><span class="n">title</span><span class="p">,</span>
                     <span class="n">model</span><span class="o">=</span><span class="n">loaded_keybert</span><span class="p">,</span>
+                    <span class="n">keyphrase_ngram_range</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
                     <span class="n">stop_words</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                 <span class="p">)</span>
             <span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">title_keywords</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">title_general_keywords</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">title_strict_keywords</span> <span class="o">=</span> <span class="p">[]</span>
 
         <span class="k">if</span> <span class="n">paper</span><span class="o">.</span><span class="n">abstract</span><span class="p">:</span>
-            <span class="n">abstract_keywords</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">abstract_general_keywords</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">SearchQueryDataTracker</span><span class="p">(</span>
+                    <span class="n">query_str</span><span class="o">=</span><span class="n">word</span><span class="p">,</span>
+                    <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="k">for</span> <span class="n">word</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">_get_keywords</span><span class="p">(</span>
+                    <span class="n">paper</span><span class="o">.</span><span class="n">abstract</span><span class="p">,</span>
+                    <span class="n">model</span><span class="o">=</span><span class="n">loaded_keybert</span><span class="p">,</span>
+                    <span class="c1"># stop_words=None,</span>
+                <span class="p">)</span>
+            <span class="p">]</span>
+            <span class="n">abstract_strict_keywords</span> <span class="o">=</span> <span class="p">[</span>
                 <span class="n">SearchQueryDataTracker</span><span class="p">(</span>
                     <span class="n">query_str</span><span class="o">=</span><span class="n">word</span><span class="p">,</span>
                     <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
@@ -520,16 +547,20 @@
                 <span class="k">for</span> <span class="n">word</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">_get_keywords</span><span class="p">(</span>
                     <span class="n">paper</span><span class="o">.</span><span class="n">abstract</span><span class="p">,</span>
                     <span class="n">model</span><span class="o">=</span><span class="n">loaded_keybert</span><span class="p">,</span>
+                    <span class="n">keyphrase_ngram_range</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
                     <span class="n">stop_words</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                 <span class="p">)</span>
             <span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">abstract_keywords</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">abstract_general_keywords</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">abstract_strict_keywords</span> <span class="o">=</span> <span class="p">[]</span>
 
         <span class="c1"># Reduce in case of duplicates</span>
         <span class="n">all_query_datas</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="o">*</span><span class="n">title_keywords</span><span class="p">,</span>
-            <span class="o">*</span><span class="n">abstract_keywords</span><span class="p">,</span>
+            <span class="o">*</span><span class="n">title_general_keywords</span><span class="p">,</span>
+            <span class="o">*</span><span class="n">title_strict_keywords</span><span class="p">,</span>
+            <span class="o">*</span><span class="n">abstract_general_keywords</span><span class="p">,</span>
+            <span class="o">*</span><span class="n">abstract_strict_keywords</span><span class="p">,</span>
         <span class="p">]</span>
         <span class="n">set_queries</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">set_query_strs</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
@@ -537,6 +568,29 @@
             <span class="k">if</span> <span class="n">qd</span><span class="o">.</span><span class="n">query_str</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">set_query_strs</span><span class="p">:</span>
                 <span class="n">set_queries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">qd</span><span class="p">)</span>
                 <span class="n">set_query_strs</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">qd</span><span class="o">.</span><span class="n">query_str</span><span class="p">)</span>
+
+        <span class="c1"># Add random sample combinations of query strs</span>
+        <span class="n">sampled_combinations</span> <span class="o">=</span> <span class="n">sample</span><span class="p">(</span>
+            <span class="nb">list</span><span class="p">(</span>
+                <span class="n">itertools</span><span class="o">.</span><span class="n">combinations</span><span class="p">(</span>
+                    <span class="n">set_queries</span><span class="p">,</span>
+                    <span class="mi">2</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">),</span>
+            <span class="n">k</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Unpack the sampled combinations</span>
+        <span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">sampled_combinations</span><span class="p">:</span>
+            <span class="c1"># Handle joint strictness</span>
+            <span class="n">wrapped_a</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;&quot;</span><span class="si">{</span><span class="n">a</span><span class="o">.</span><span class="n">query_str</span><span class="si">}</span><span class="s1">&quot;&#39;</span> <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">strict</span> <span class="k">else</span> <span class="n">a</span><span class="o">.</span><span class="n">query_str</span>
+            <span class="n">wrapped_b</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;&quot;</span><span class="si">{</span><span class="n">b</span><span class="o">.</span><span class="n">query_str</span><span class="si">}</span><span class="s1">&quot;&#39;</span> <span class="k">if</span> <span class="n">b</span><span class="o">.</span><span class="n">strict</span> <span class="k">else</span> <span class="n">b</span><span class="o">.</span><span class="n">query_str</span>
+            <span class="n">set_queries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">SearchQueryDataTracker</span><span class="p">(</span>
+                    <span class="n">query_str</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">wrapped_a</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">wrapped_b</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                    <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
 
     <span class="c1"># Paper was provided with keywords, use those</span>
     <span class="k">else</span><span class="p">:</span>
