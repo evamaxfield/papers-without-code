@@ -367,10 +367,15 @@ def get_repos(
                 set_query_strs.add(qd.query_str)
 
         # Add random sample combinations of query strs
-        sampled_combinations = sample(list(itertools.combinations(
-            set_queries,
-            2,
-        )), k=3)
+        sampled_combinations = sample(
+            list(
+                itertools.combinations(
+                    set_queries,
+                    2,
+                )
+            ),
+            k=3,
+        )
 
         # Unpack the sampled combinations
         for a, b in sampled_combinations:
@@ -379,7 +384,7 @@ def get_repos(
             wrapped_b = f'"{b.query_str}"' if b.strict else b.query_str
             set_queries.append(
                 SearchQueryDataTracker(
-                    query_str=f"{wrapped_a} {wrapped_b}"
+                    query_str=f"{wrapped_a} {wrapped_b}",
                     strict=False,
                 )
             )
