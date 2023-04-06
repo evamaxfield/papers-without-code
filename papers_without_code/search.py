@@ -6,6 +6,7 @@ from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from functools import partial
 from pathlib import Path
+from random import sample
 from typing import List, Optional, Tuple
 
 import backoff
@@ -85,6 +86,8 @@ def get_paper(query: str) -> MinimalPaperDetails:
 def _get_keywords(
     text: str,
     stop_words: Optional[str] = "english",
+    keyphrase_ngram_range: Tuple[int, int] = (3, 4),
+    top_n: int = 3,
     model: Optional[KeyBERT] = None,
 ) -> List[Tuple[str, float]]:
     # Load model
@@ -97,8 +100,8 @@ def _get_keywords(
 
     return model.extract_keywords(
         text,
-        keyphrase_ngram_range=(3, 4),
-        top_n=5,
+        keyphrase_ngram_range=keyphrase_ngram_range,
+        top_n=top_n,
         stop_words=stop_words,
     )
 
@@ -294,7 +297,18 @@ def get_repos(
     if not paper.keywords:
         # Get all the queries we want to run
         if paper.title:
-            title_keywords = [
+            title_general_keywords = [
+                SearchQueryDataTracker(
+                    query_str=word,
+                    strict=False,
+                )
+                for word, _ in _get_keywords(
+                    paper.title,
+                    model=loaded_keybert,
+                    # stop_words=None,
+                )
+            ]
+            title_strict_keywords = [
                 SearchQueryDataTracker(
                     query_str=word,
                     strict=True,
@@ -302,14 +316,27 @@ def get_repos(
                 for word, _ in _get_keywords(
                     paper.title,
                     model=loaded_keybert,
+                    keyphrase_ngram_range=(1, 3),
                     stop_words=None,
                 )
             ]
         else:
-            title_keywords = []
+            title_general_keywords = []
+            title_strict_keywords = []
 
         if paper.abstract:
-            abstract_keywords = [
+            abstract_general_keywords = [
+                SearchQueryDataTracker(
+                    query_str=word,
+                    strict=False,
+                )
+                for word, _ in _get_keywords(
+                    paper.abstract,
+                    model=loaded_keybert,
+                    # stop_words=None,
+                )
+            ]
+            abstract_strict_keywords = [
                 SearchQueryDataTracker(
                     query_str=word,
                     strict=True,
@@ -317,16 +344,20 @@ def get_repos(
                 for word, _ in _get_keywords(
                     paper.abstract,
                     model=loaded_keybert,
+                    keyphrase_ngram_range=(2, 3),
                     stop_words=None,
                 )
             ]
         else:
-            abstract_keywords = []
+            abstract_general_keywords = []
+            abstract_strict_keywords = []
 
         # Reduce in case of duplicates
         all_query_datas = [
-            *title_keywords,
-            *abstract_keywords,
+            *title_general_keywords,
+            *title_strict_keywords,
+            *abstract_general_keywords,
+            *abstract_strict_keywords,
         ]
         set_queries = []
         set_query_strs = set()
@@ -334,6 +365,24 @@ def get_repos(
             if qd.query_str not in set_query_strs:
                 set_queries.append(qd)
                 set_query_strs.add(qd.query_str)
+
+        # Add random sample combinations of query strs
+        sampled_combinations = sample(list(itertools.combinations(
+            set_queries,
+            2,
+        )), k=3)
+
+        # Unpack the sampled combinations
+        for a, b in sampled_combinations:
+            # Handle joint strictness
+            wrapped_a = f'"{a.query_str}"' if a.strict else a.query_str
+            wrapped_b = f'"{b.query_str}"' if b.strict else b.query_str
+            set_queries.append(
+                SearchQueryDataTracker(
+                    query_str=f"{wrapped_a} {wrapped_b}"
+                    strict=False,
+                )
+            )
 
     # Paper was provided with keywords, use those
     else:
