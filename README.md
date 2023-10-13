@@ -47,19 +47,18 @@ because we automatically fetch, spin up, and tear down containers for processing
 
 ## How it Works
 
-In short, we pass the query on to the Semantic Scholar search service
-(wrapped by [danielnsilva/semanticscholar](https://github.com/danielnsilva/semanticscholar))
-which provides us basic details about the paper. We then use
-[KeyBERT](https://github.com/MaartenGr/KeyBERT) to extract keywords from the paper
+In short, we pass the query on to the Semantic Scholar search API
+which provides us basic details about the paper. We use
+a prompted gpt-3.5-turbo with langchain to extract keywords from the 
 title and abstract. We then make multiple threaded requests to GitHub's API
 for repositories which match the keywords. Once we have all the possible repositories
 back, we rank them by similarity between the repository's README and the paper's
 abstract (or if not available, it's title).
 
 When using Papers without Code locally and providing a filepath, the only change to
-this workflow, is keyword extraction. When local and providing a filepath,
-we use [GROBID](https://github.com/kermitt2/grobid) to extract
-keywords from the full text of the paper in addition to the title and abstract.
+this workflow, is paper details gathering. When local and providing a filepath,
+we use [GROBID](https://github.com/kermitt2/grobid) to extract the
+title, abstract, and author list.
 
 ## Documentation
 
