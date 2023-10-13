@@ -29,6 +29,9 @@ jobs:
         run: |
           just generate-docs
           touch docs/_build/.nojekyll
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
       - name: Publish Docs
         uses: JamesIves/github-pages-deploy-action@v4
         with:
