@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" />
 
     <!-- Generated with Sphinx 7.2.6 and Furo 2023.09.10 -->
-        <title>papers_without_code.search - papers-without-code 0.1.dev1+g43a729f documentation</title>
+        <title>papers_without_code.search - papers-without-code 0.1.dev1+g6f2d8ee documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=135e06be" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -123,7 +123,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../index.html"><div class="brand">papers-without-code 0.1.dev1+g43a729f documentation</div></a>
+      <a href="../../index.html"><div class="brand">papers-without-code 0.1.dev1+g6f2d8ee documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -146,7 +146,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
   
   
-  <span class="sidebar-brand-text">papers-without-code 0.1.dev1+g43a729f documentation</span>
+  <span class="sidebar-brand-text">papers-without-code 0.1.dev1+g6f2d8ee documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -204,13 +204,12 @@
 <span></span><span class="ch">#!/usr/bin/env python</span>
 
 <span class="kn">import</span> <span class="nn">itertools</span>
+<span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">from</span> <span class="nn">concurrent.futures</span> <span class="kn">import</span> <span class="n">ThreadPoolExecutor</span>
 <span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
 <span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span> <span class="nn">random</span> <span class="kn">import</span> <span class="n">sample</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
 
 <span class="kn">import</span> <span class="nn">backoff</span>
 <span class="kn">import</span> <span class="nn">requests</span>
@@ -219,7 +218,11 @@
 <span class="kn">from</span> <span class="nn">dotenv</span> <span class="kn">import</span> <span class="n">load_dotenv</span>
 <span class="kn">from</span> <span class="nn">fastcore.net</span> <span class="kn">import</span> <span class="n">HTTP4xxClientError</span>
 <span class="kn">from</span> <span class="nn">ghapi.all</span> <span class="kn">import</span> <span class="n">GhApi</span>
-<span class="kn">from</span> <span class="nn">keybert</span> <span class="kn">import</span> <span class="n">KeyBERT</span>
+<span class="kn">from</span> <span class="nn">langchain</span> <span class="kn">import</span> <span class="n">PromptTemplate</span>
+<span class="kn">from</span> <span class="nn">langchain.chat_models</span> <span class="kn">import</span> <span class="n">ChatOpenAI</span>
+<span class="kn">from</span> <span class="nn">langchain.output_parsers</span> <span class="kn">import</span> <span class="n">PydanticOutputParser</span>
+<span class="kn">from</span> <span class="nn">langchain.schema</span> <span class="kn">import</span> <span class="n">HumanMessage</span>
+<span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">Field</span>
 <span class="kn">from</span> <span class="nn">requests.exceptions</span> <span class="kn">import</span> <span class="n">HTTPError</span>
 <span class="kn">from</span> <span class="nn">sentence_transformers</span> <span class="kn">import</span> <span class="n">SentenceTransformer</span><span class="p">,</span> <span class="n">util</span>
 
@@ -231,7 +234,7 @@
 
 <span class="c1">###############################################################################</span>
 
-<span class="n">DEFAULT_TRANSFORMER_MODEL</span> <span class="o">=</span> <span class="s2">&quot;allenai-specter&quot;</span>
+<span class="n">DEFAULT_TRANSFORMER_MODEL</span> <span class="o">=</span> <span class="s2">&quot;thenlper/gte-small&quot;</span>
 <span class="n">DEFAULT_LOCAL_CACHE_MODEL</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;./sentence-transformers_</span><span class="si">{</span><span class="n">DEFAULT_TRANSFORMER_MODEL</span><span class="si">}</span><span class="s2">&quot;</span>
 
 <span class="c1">###############################################################################</span>
@@ -268,11 +271,12 @@
     <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Getting SemanticScholar paper details with query: &#39;</span><span class="si">{</span><span class="n">query</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
     <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
         <span class="sa">f</span><span class="s2">&quot;https://api.semanticscholar.org/graph/v1/paper/</span><span class="si">{</span><span class="n">query</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;?fields=paperId,title,authors,abstract&quot;</span>
     <span class="p">)</span>
     <span class="n">response</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
     <span class="n">response_data</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
-    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">response_data</span><span class="p">)</span>
     <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Found SemanticScholar paper with query: &#39;</span><span class="si">{</span><span class="n">query</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Response data: </span><span class="si">{</span><span class="n">response_data</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="c1"># Handle no paper found</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">response_data</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
@@ -289,27 +293,85 @@
 
 
 
-<span class="k">def</span> <span class="nf">_get_keywords</span><span class="p">(</span>
-    <span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-    <span class="n">stop_words</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;english&quot;</span><span class="p">,</span>
-    <span class="n">keyphrase_ngram_range</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
-    <span class="n">top_n</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
-    <span class="n">model</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">KeyBERT</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]:</span>
-    <span class="c1"># Load model</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">model</span><span class="p">:</span>
-        <span class="n">potential_cache_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">DEFAULT_LOCAL_CACHE_MODEL</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
-        <span class="k">if</span> <span class="n">potential_cache_dir</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-            <span class="n">model</span> <span class="o">=</span> <span class="n">KeyBERT</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">potential_cache_dir</span><span class="p">))</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">model</span> <span class="o">=</span> <span class="n">KeyBERT</span><span class="p">(</span><span class="n">DEFAULT_TRANSFORMER_MODEL</span><span class="p">)</span>
+<div class="viewcode-block" id="LLMKeywordResults">
+<a class="viewcode-back" href="../../papers_without_code.html#papers_without_code.search.LLMKeywordResults">[docs]</a>
+<span class="k">class</span> <span class="nc">LLMKeywordResults</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">keywords</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">description</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;Extracted keyword sequences found in the text.&quot;</span><span class="p">)</span>
+    <span class="p">)</span></div>
 
-    <span class="k">return</span> <span class="n">model</span><span class="o">.</span><span class="n">extract_keywords</span><span class="p">(</span>
-        <span class="n">text</span><span class="p">,</span>
-        <span class="n">keyphrase_ngram_range</span><span class="o">=</span><span class="n">keyphrase_ngram_range</span><span class="p">,</span>
-        <span class="n">top_n</span><span class="o">=</span><span class="n">top_n</span><span class="p">,</span>
-        <span class="n">stop_words</span><span class="o">=</span><span class="n">stop_words</span><span class="p">,</span>
+
+
+<span class="n">LLM_KEYWORD_RESULTS_PARSER</span> <span class="o">=</span> <span class="n">PydanticOutputParser</span><span class="p">(</span><span class="n">pydantic_object</span><span class="o">=</span><span class="n">LLMKeywordResults</span><span class="p">)</span>
+
+<span class="n">LLM_KEYWORD_PROMPT_STRING</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s2">&quot;Task: Create a list of five keywords from the following text. &quot;</span>
+    <span class="s2">&quot;Keywords can range from one to four words in length. &quot;</span>
+    <span class="s2">&quot;Only extracted text should be included in the list of keywords. &quot;</span>
+    <span class="s2">&quot;Keywords can include acronyms and abbreviations.</span><span class="se">\n\n</span><span class="s2">&quot;</span>
+    <span class="s2">&quot;{{ format_instructions }}&quot;</span>
+    <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">---</span><span class="se">\n\n</span><span class="s2">&quot;</span>
+    <span class="s2">&quot;Example Input Text:</span><span class="se">\n\n</span><span class="s2">&quot;</span>
+    <span class="s2">&quot;SciBERT: A Pretrained Language Model for Scientific Text &quot;</span>
+    <span class="s2">&quot;Obtaining large-scale annotated data for NLP tasks in the &quot;</span>
+    <span class="s2">&quot;scientific domain is challenging and expensive. We release SciBERT, &quot;</span>
+    <span class="s2">&quot;a pretrained language model based on BERT (Devlin et. al., 2018) &quot;</span>
+    <span class="s2">&quot;to address the lack of high-quality, large-scale labeled scientific data. &quot;</span>
+    <span class="s2">&quot;SciBERT leverages unsupervised pretraining on a large multi-domain corpus of &quot;</span>
+    <span class="s2">&quot;scientific publications to improve performance on downstream scientific &quot;</span>
+    <span class="s2">&quot;NLP tasks. We evaluate on a suite of tasks including sequence tagging, &quot;</span>
+    <span class="s2">&quot;sentence classification and dependency parsing, with datasets from a &quot;</span>
+    <span class="s2">&quot;variety of scientific domains. We demonstrate statistically significant &quot;</span>
+    <span class="s2">&quot;improvements over BERT and achieve new state-of-the-art results on several &quot;</span>
+    <span class="s2">&quot;of these tasks. The code and pretrained models are available at &quot;</span>
+    <span class="s2">&quot;https://github.com/allenai/scibert/.&quot;</span>
+    <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">---</span><span class="se">\n\n</span><span class="s2">&quot;</span>
+    <span class="s2">&quot;Example Output Text:</span><span class="se">\n\n</span><span class="s2">&quot;</span>
+    <span class="s1">&#39;{&quot;keywords&quot;: [&#39;</span>
+    <span class="s1">&#39;&quot;SciBERT&quot;, &#39;</span>
+    <span class="s1">&#39;&quot;Language Model for Scientific Text&quot;, &#39;</span>
+    <span class="s1">&#39;&quot;large-scale labeled scientific data&quot;, &#39;</span>
+    <span class="s1">&#39;&quot;Scientific Text&quot;, &#39;</span>
+    <span class="s1">&#39;&quot;SciBERT leverages unsupervised pretraining&quot;&#39;</span>
+    <span class="s2">&quot;]}&quot;</span>
+    <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">---</span><span class="se">\n\n</span><span class="s2">&quot;</span>
+    <span class="s2">&quot;Input Text:</span><span class="se">\n\n</span><span class="s2">{{ text }}&quot;</span>
+    <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">---</span><span class="se">\n\n</span><span class="s2">&quot;</span>
+<span class="p">)</span>
+
+<span class="n">LLM_KEYWORD_PROMPT_TEMPLATE</span> <span class="o">=</span> <span class="n">PromptTemplate</span><span class="o">.</span><span class="n">from_template</span><span class="p">(</span>
+    <span class="n">LLM_KEYWORD_PROMPT_STRING</span><span class="p">,</span>
+    <span class="n">template_format</span><span class="o">=</span><span class="s2">&quot;jinja2&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">backoff</span><span class="o">.</span><span class="n">on_exception</span><span class="p">(</span><span class="n">backoff</span><span class="o">.</span><span class="n">expo</span><span class="p">,</span> <span class="n">exception</span><span class="o">=</span><span class="n">json</span><span class="o">.</span><span class="n">JSONDecodeError</span><span class="p">,</span> <span class="n">max_time</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_run_keyword_get_from_llm</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">llm</span><span class="p">:</span> <span class="n">ChatOpenAI</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LLMKeywordResults</span><span class="p">:</span>
+    <span class="c1"># Fill prompt to get input</span>
+    <span class="n">input_</span> <span class="o">=</span> <span class="n">LLM_KEYWORD_PROMPT_TEMPLATE</span><span class="o">.</span><span class="n">format_prompt</span><span class="p">(</span>
+        <span class="n">text</span><span class="o">=</span><span class="n">text</span><span class="p">,</span>
+        <span class="n">format_instructions</span><span class="o">=</span><span class="n">LLM_KEYWORD_RESULTS_PARSER</span><span class="o">.</span><span class="n">get_format_instructions</span><span class="p">(),</span>
     <span class="p">)</span>
+
+    <span class="c1"># Generate keywords</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="n">llm</span><span class="p">([</span><span class="n">HumanMessage</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="n">input_</span><span class="o">.</span><span class="n">text</span><span class="p">)])</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
+    <span class="c1"># Parse output</span>
+    <span class="n">parsed_output</span> <span class="o">=</span> <span class="n">LLM_KEYWORD_RESULTS_PARSER</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">parsed_output</span>
+
+
+<span class="k">def</span> <span class="nf">_get_keywords</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="c1"># Create connection to LLM</span>
+    <span class="n">llm</span> <span class="o">=</span> <span class="n">ChatOpenAI</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="s2">&quot;gpt-3.5-turbo&quot;</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">max_tokens</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+
+    <span class="c1"># Get keywords</span>
+    <span class="n">parsed_output</span> <span class="o">=</span> <span class="n">_run_keyword_get_from_llm</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">llm</span><span class="p">)</span>
+
+    <span class="c1"># Return keywords</span>
+    <span class="k">return</span> <span class="n">parsed_output</span><span class="o">.</span><span class="n">keywords</span>
 
 
 <div class="viewcode-block" id="SearchQueryDataTracker">
@@ -337,7 +399,7 @@
 <span class="nd">@backoff</span><span class="o">.</span><span class="n">on_exception</span><span class="p">(</span><span class="n">backoff</span><span class="o">.</span><span class="n">expo</span><span class="p">,</span> <span class="n">HTTP4xxClientError</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">_search_repos</span><span class="p">(</span>
     <span class="n">query</span><span class="p">:</span> <span class="n">SearchQueryDataTracker</span><span class="p">,</span> <span class="n">api</span><span class="p">:</span> <span class="n">GhApi</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">SearchQueryResponse</span><span class="p">]:</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">SearchQueryResponse</span><span class="p">]:</span>
     <span class="c1"># Make request</span>
     <span class="k">if</span> <span class="n">query</span><span class="o">.</span><span class="n">strict</span><span class="p">:</span>
         <span class="n">response</span> <span class="o">=</span> <span class="n">api</span><span class="p">(</span>
@@ -397,7 +459,7 @@
 <span class="nd">@backoff</span><span class="o">.</span><span class="n">on_exception</span><span class="p">(</span><span class="n">backoff</span><span class="o">.</span><span class="n">expo</span><span class="p">,</span> <span class="n">HTTPError</span><span class="p">,</span> <span class="n">max_time</span><span class="o">=</span><span class="mi">60</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">_get_repo_readme_content</span><span class="p">(</span>
     <span class="n">repo_data</span><span class="p">:</span> <span class="n">SearchQueryResponse</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">RepoReadmeResponse</span><span class="p">]:</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RepoReadmeResponse</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
     <span class="c1"># Request repo page</span>
     <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;https://github.com/</span><span class="si">{</span><span class="n">repo_data</span><span class="o">.</span><span class="n">repo_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="n">response</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
@@ -437,10 +499,10 @@
 
 
 <span class="k">def</span> <span class="nf">_semantic_sim_repos</span><span class="p">(</span>
-    <span class="n">all_repos_details</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">RepoReadmeResponse</span><span class="p">],</span>
+    <span class="n">all_repos_details</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">RepoReadmeResponse</span><span class="p">],</span>
     <span class="n">paper</span><span class="p">:</span> <span class="n">MinimalPaperDetails</span><span class="p">,</span>
-    <span class="n">model</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">SentenceTransformer</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">RepoDetails</span><span class="p">]:</span>
+    <span class="n">model</span><span class="p">:</span> <span class="n">SentenceTransformer</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">RepoDetails</span><span class="p">]:</span>
     <span class="c1"># Load model</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">model</span><span class="p">:</span>
         <span class="n">potential_cache_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">DEFAULT_LOCAL_CACHE_MODEL</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
@@ -482,9 +544,8 @@
 <a class="viewcode-back" href="../../papers_without_code.html#papers_without_code.search.get_repos">[docs]</a>
 <span class="k">def</span> <span class="nf">get_repos</span><span class="p">(</span>
     <span class="n">paper</span><span class="p">:</span> <span class="n">MinimalPaperDetails</span><span class="p">,</span>
-    <span class="n">loaded_keybert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">KeyBERT</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">loaded_sent_transformer</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">SentenceTransformer</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">RepoDetails</span><span class="p">]:</span>
+    <span class="n">loaded_sent_transformer</span><span class="p">:</span> <span class="n">SentenceTransformer</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">RepoDetails</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Try to find GitHub repositories matching a provided paper.</span>
 
@@ -492,9 +553,6 @@
 <span class="sd">    ----------</span>
 <span class="sd">    paper: MinimalPaperDetails</span>
 <span class="sd">        The paper to try and find similar repositories to.</span>
-<span class="sd">    loaded_keybert: Optional[KeyBERT]</span>
-<span class="sd">        An optional preloaded KeyBERT model to use instead of loading a new one.</span>
-<span class="sd">        Default: None</span>
 <span class="sd">    loaded_sent_transformer: Optional[SentenceTransformer]</span>
 <span class="sd">        An optional preloaded SentenceTransformer model to use</span>
 <span class="sd">        instead of loading a new one.</span>
@@ -502,7 +560,7 @@
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    List[RepoDetails]</span>
+<span class="sd">    list[RepoDetails]</span>
 <span class="sd">        A list of repositories that are similar to the paper,</span>
 <span class="sd">        sorted by each repositories README&#39;s semantic similarity</span>
 <span class="sd">        to the abstract (or title if no abstract was attached to the paper details).</span>
@@ -516,115 +574,37 @@
     <span class="c1"># No keywords were provided, generate from abstract and title</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">paper</span><span class="o">.</span><span class="n">keywords</span><span class="p">:</span>
         <span class="c1"># Get all the queries we want to run</span>
-        <span class="k">if</span> <span class="n">paper</span><span class="o">.</span><span class="n">title</span><span class="p">:</span>
-            <span class="n">title_subset</span> <span class="o">=</span> <span class="p">[</span>
-                <span class="n">SearchQueryDataTracker</span><span class="p">(</span>
-                    <span class="n">query_str</span><span class="o">=</span><span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">paper</span><span class="o">.</span><span class="n">title</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)[:</span><span class="mi">3</span><span class="p">]),</span>
-                    <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                <span class="p">)</span>
-            <span class="p">]</span>
-            <span class="n">title_general_keywords</span> <span class="o">=</span> <span class="p">[</span>
-                <span class="n">SearchQueryDataTracker</span><span class="p">(</span>
-                    <span class="n">query_str</span><span class="o">=</span><span class="n">word</span><span class="p">,</span>
-                    <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                <span class="p">)</span>
-                <span class="k">for</span> <span class="n">word</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">_get_keywords</span><span class="p">(</span>
-                    <span class="n">paper</span><span class="o">.</span><span class="n">title</span><span class="p">,</span>
-                    <span class="n">model</span><span class="o">=</span><span class="n">loaded_keybert</span><span class="p">,</span>
-                    <span class="c1"># stop_words=None,</span>
-                <span class="p">)</span>
-            <span class="p">]</span>
-            <span class="n">title_strict_keywords</span> <span class="o">=</span> <span class="p">[</span>
-                <span class="n">SearchQueryDataTracker</span><span class="p">(</span>
-                    <span class="n">query_str</span><span class="o">=</span><span class="n">word</span><span class="p">,</span>
-                    <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                <span class="p">)</span>
-                <span class="k">for</span> <span class="n">word</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">_get_keywords</span><span class="p">(</span>
-                    <span class="n">paper</span><span class="o">.</span><span class="n">title</span><span class="p">,</span>
-                    <span class="n">model</span><span class="o">=</span><span class="n">loaded_keybert</span><span class="p">,</span>
-                    <span class="n">keyphrase_ngram_range</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
-                    <span class="n">stop_words</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                <span class="p">)</span>
-            <span class="p">]</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">title_subset</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="n">title_general_keywords</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="n">title_strict_keywords</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">paper</span><span class="o">.</span><span class="n">title</span> <span class="ow">and</span> <span class="n">paper</span><span class="o">.</span><span class="n">abstract</span><span class="p">:</span>
+            <span class="n">paper_content</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">paper</span><span class="o">.</span><span class="n">title</span><span class="si">}</span><span class="se">\n\n</span><span class="si">{</span><span class="n">paper</span><span class="o">.</span><span class="n">abstract</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">elif</span> <span class="n">paper</span><span class="o">.</span><span class="n">title</span><span class="p">:</span>
+            <span class="n">paper_content</span> <span class="o">=</span> <span class="n">paper</span><span class="o">.</span><span class="n">title</span>
+        <span class="k">elif</span> <span class="n">paper</span><span class="o">.</span><span class="n">abstract</span><span class="p">:</span>
+            <span class="n">paper_content</span> <span class="o">=</span> <span class="n">paper</span><span class="o">.</span><span class="n">abstract</span>
 
-        <span class="k">if</span> <span class="n">paper</span><span class="o">.</span><span class="n">abstract</span><span class="p">:</span>
-            <span class="n">abstract_general_keywords</span> <span class="o">=</span> <span class="p">[</span>
-                <span class="n">SearchQueryDataTracker</span><span class="p">(</span>
-                    <span class="n">query_str</span><span class="o">=</span><span class="n">word</span><span class="p">,</span>
-                    <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                <span class="p">)</span>
-                <span class="k">for</span> <span class="n">word</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">_get_keywords</span><span class="p">(</span>
-                    <span class="n">paper</span><span class="o">.</span><span class="n">abstract</span><span class="p">,</span>
-                    <span class="n">model</span><span class="o">=</span><span class="n">loaded_keybert</span><span class="p">,</span>
-                    <span class="c1"># stop_words=None,</span>
-                <span class="p">)</span>
-            <span class="p">]</span>
-            <span class="n">abstract_strict_keywords</span> <span class="o">=</span> <span class="p">[</span>
-                <span class="n">SearchQueryDataTracker</span><span class="p">(</span>
-                    <span class="n">query_str</span><span class="o">=</span><span class="n">word</span><span class="p">,</span>
-                    <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                <span class="p">)</span>
-                <span class="k">for</span> <span class="n">word</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">_get_keywords</span><span class="p">(</span>
-                    <span class="n">paper</span><span class="o">.</span><span class="n">abstract</span><span class="p">,</span>
-                    <span class="n">model</span><span class="o">=</span><span class="n">loaded_keybert</span><span class="p">,</span>
-                    <span class="n">keyphrase_ngram_range</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
-                    <span class="n">stop_words</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                <span class="p">)</span>
-            <span class="p">]</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">abstract_general_keywords</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="n">abstract_strict_keywords</span> <span class="o">=</span> <span class="p">[]</span>
-
-        <span class="c1"># Reduce in case of duplicates</span>
-        <span class="n">all_query_datas</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="o">*</span><span class="n">title_subset</span><span class="p">,</span>
-            <span class="o">*</span><span class="n">title_general_keywords</span><span class="p">,</span>
-            <span class="o">*</span><span class="n">title_strict_keywords</span><span class="p">,</span>
-            <span class="o">*</span><span class="n">abstract_general_keywords</span><span class="p">,</span>
-            <span class="o">*</span><span class="n">abstract_strict_keywords</span><span class="p">,</span>
-        <span class="p">]</span>
-        <span class="n">set_queries</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="n">set_query_strs</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">qd</span> <span class="ow">in</span> <span class="n">all_query_datas</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">qd</span><span class="o">.</span><span class="n">query_str</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">set_query_strs</span><span class="p">:</span>
-                <span class="n">set_queries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">qd</span><span class="p">)</span>
-                <span class="n">set_query_strs</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">qd</span><span class="o">.</span><span class="n">query_str</span><span class="p">)</span>
-
-        <span class="c1"># Add random sample combinations of query strs</span>
-        <span class="n">sampled_combinations</span> <span class="o">=</span> <span class="n">sample</span><span class="p">(</span>
-            <span class="nb">list</span><span class="p">(</span>
-                <span class="n">itertools</span><span class="o">.</span><span class="n">combinations</span><span class="p">(</span>
-                    <span class="n">set_queries</span><span class="p">,</span>
-                    <span class="mi">2</span><span class="p">,</span>
-                <span class="p">)</span>
-            <span class="p">),</span>
-            <span class="n">k</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+        <span class="c1"># Get keywords</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Right before keyword search...&quot;</span><span class="p">)</span>
+        <span class="n">keywords</span> <span class="o">=</span> <span class="n">_get_keywords</span><span class="p">(</span>
+            <span class="n">paper_content</span><span class="p">,</span>
         <span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Right after keywords search...&quot;</span><span class="p">)</span>
 
-        <span class="c1"># Unpack the sampled combinations</span>
-        <span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">sampled_combinations</span><span class="p">:</span>
-            <span class="c1"># Handle joint strictness</span>
-            <span class="n">wrapped_a</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;&quot;</span><span class="si">{</span><span class="n">a</span><span class="o">.</span><span class="n">query_str</span><span class="si">}</span><span class="s1">&quot;&#39;</span> <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">strict</span> <span class="k">else</span> <span class="n">a</span><span class="o">.</span><span class="n">query_str</span>
-            <span class="n">wrapped_b</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;&quot;</span><span class="si">{</span><span class="n">b</span><span class="o">.</span><span class="n">query_str</span><span class="si">}</span><span class="s1">&quot;&#39;</span> <span class="k">if</span> <span class="n">b</span><span class="o">.</span><span class="n">strict</span> <span class="k">else</span> <span class="n">b</span><span class="o">.</span><span class="n">query_str</span>
-            <span class="n">set_queries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                <span class="n">SearchQueryDataTracker</span><span class="p">(</span>
-                    <span class="n">query_str</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">wrapped_a</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">wrapped_b</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
-                    <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                <span class="p">)</span>
+        <span class="c1"># Create the queries</span>
+        <span class="n">set_queries</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">SearchQueryDataTracker</span><span class="p">(</span>
+                <span class="n">query_str</span><span class="o">=</span><span class="n">keyword</span><span class="p">,</span>
+                <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
             <span class="p">)</span>
+            <span class="k">for</span> <span class="n">keyword</span> <span class="ow">in</span> <span class="n">keywords</span>
+        <span class="p">]</span>
 
     <span class="c1"># Paper was provided with keywords, use those</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">set_queries</span> <span class="o">=</span> <span class="p">[</span>
             <span class="n">SearchQueryDataTracker</span><span class="p">(</span>
-                <span class="n">query_str</span><span class="o">=</span><span class="n">word</span><span class="p">,</span>
+                <span class="n">query_str</span><span class="o">=</span><span class="n">keyword</span><span class="p">,</span>
                 <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
             <span class="p">)</span>
-            <span class="k">for</span> <span class="n">word</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">paper</span><span class="o">.</span><span class="n">keywords</span>
+            <span class="k">for</span> <span class="n">keyword</span> <span class="ow">in</span> <span class="n">paper</span><span class="o">.</span><span class="n">keywords</span>
         <span class="p">]</span>
 
     <span class="c1"># Progress info</span>
@@ -696,7 +676,7 @@
       
     </aside>
   </div>
-</div><script src="../../_static/documentation_options.js?v=67c8eaf3"></script>
+</div><script src="../../_static/documentation_options.js?v=81b950bc"></script>
     <script src="../../_static/doctools.js?v=888ff710"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/scripts/furo.js?v=32e29ea5"></script>

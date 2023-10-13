@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" />
 
     <!-- Generated with Sphinx 7.2.6 and Furo 2023.09.10 -->
-        <title>papers_without_code.processing - papers-without-code 0.1.dev1+g43a729f documentation</title>
+        <title>papers_without_code.processing - papers-without-code 0.1.dev1+g6f2d8ee documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=135e06be" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -123,7 +123,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../index.html"><div class="brand">papers-without-code 0.1.dev1+g43a729f documentation</div></a>
+      <a href="../../index.html"><div class="brand">papers-without-code 0.1.dev1+g6f2d8ee documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -146,7 +146,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
   
   
-  <span class="sidebar-brand-text">papers-without-code 0.1.dev1+g43a729f documentation</span>
+  <span class="sidebar-brand-text">papers-without-code 0.1.dev1+g6f2d8ee documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -204,11 +204,10 @@
 <span></span><span class="ch">#!/usr/bin/env python</span>
 
 <span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span>
-
-<span class="kn">from</span> <span class="nn">keybert</span> <span class="kn">import</span> <span class="n">KeyBERT</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span>
 
 <span class="kn">from</span> <span class="nn">.custom_types</span> <span class="kn">import</span> <span class="n">AuthorDetails</span><span class="p">,</span> <span class="n">MinimalPaperDetails</span>
+<span class="kn">from</span> <span class="nn">.search</span> <span class="kn">import</span> <span class="n">_get_keywords</span>
 
 <span class="c1">###############################################################################</span>
 
@@ -217,13 +216,13 @@
 <span class="c1">###############################################################################</span>
 
 
-<span class="k">def</span> <span class="nf">_get_title</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">_get_title</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;teiHeader&quot;</span><span class="p">][</span><span class="s2">&quot;fileDesc&quot;</span><span class="p">][</span><span class="s2">&quot;sourceDesc&quot;</span><span class="p">][</span><span class="s2">&quot;biblStruct&quot;</span><span class="p">][</span><span class="s2">&quot;analytic&quot;</span><span class="p">][</span>
         <span class="s2">&quot;title&quot;</span>
     <span class="p">][</span><span class="s2">&quot;#text&quot;</span><span class="p">]</span>
 
 
-<span class="k">def</span> <span class="nf">_get_authors</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">AuthorDetails</span><span class="p">]:</span>
+<span class="k">def</span> <span class="nf">_get_authors</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">AuthorDetails</span><span class="p">]:</span>
     <span class="n">authors</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">authors_list_data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;teiHeader&quot;</span><span class="p">][</span><span class="s2">&quot;fileDesc&quot;</span><span class="p">][</span><span class="s2">&quot;sourceDesc&quot;</span><span class="p">][</span><span class="s2">&quot;biblStruct&quot;</span><span class="p">][</span>
         <span class="s2">&quot;analytic&quot;</span>
@@ -243,59 +242,14 @@
     <span class="k">return</span> <span class="n">authors</span>
 
 
-<span class="k">def</span> <span class="nf">_get_abstract</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">_get_abstract</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;teiHeader&quot;</span><span class="p">][</span><span class="s2">&quot;profileDesc&quot;</span><span class="p">][</span><span class="s2">&quot;abstract&quot;</span><span class="p">][</span><span class="s2">&quot;div&quot;</span><span class="p">][</span><span class="s2">&quot;p&quot;</span><span class="p">]</span>
-
-
-<span class="k">def</span> <span class="nf">_get_keywords_from_authors</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-    <span class="k">return</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;teiHeader&quot;</span><span class="p">][</span><span class="s2">&quot;profileDesc&quot;</span><span class="p">][</span><span class="s2">&quot;textClass&quot;</span><span class="p">][</span><span class="s2">&quot;keywords&quot;</span><span class="p">][</span><span class="s2">&quot;term&quot;</span><span class="p">]</span>
-
-
-<span class="k">def</span> <span class="nf">_get_paper_text</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-    <span class="n">text_segments</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">div</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">][</span><span class="s2">&quot;body&quot;</span><span class="p">][</span><span class="s2">&quot;div&quot;</span><span class="p">]:</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">div</span><span class="p">[</span><span class="s2">&quot;p&quot;</span><span class="p">],</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="n">text_segments</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">div</span><span class="p">[</span><span class="s2">&quot;p&quot;</span><span class="p">])</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">para</span> <span class="ow">in</span> <span class="n">div</span><span class="p">[</span><span class="s2">&quot;p&quot;</span><span class="p">]:</span>
-                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">para</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-                    <span class="n">text_segments</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">para</span><span class="p">)</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">text_segments</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">para</span><span class="p">[</span><span class="s2">&quot;#text&quot;</span><span class="p">])</span>
-
-    <span class="k">return</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">text_segments</span><span class="p">)</span>
-
-
-<span class="k">def</span> <span class="nf">_get_keywords_from_bert</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]:</span>
-    <span class="c1"># Get model</span>
-    <span class="n">model</span> <span class="o">=</span> <span class="n">KeyBERT</span><span class="p">()</span>
-
-    <span class="c1"># Extract keywords from title</span>
-    <span class="n">title_keywords</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">extract_keywords</span><span class="p">(</span>
-        <span class="n">_get_title</span><span class="p">(</span><span class="n">data</span><span class="p">),</span>
-        <span class="n">keyphrase_ngram_range</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
-        <span class="n">top_n</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
-        <span class="n">stop_words</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="n">abstract_keywords</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">extract_keywords</span><span class="p">(</span>
-        <span class="n">_get_abstract</span><span class="p">(</span><span class="n">data</span><span class="p">),</span>
-        <span class="n">keyphrase_ngram_range</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
-        <span class="n">top_n</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
-        <span class="n">stop_words</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="n">text_keywords</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">extract_keywords</span><span class="p">(</span>
-        <span class="n">_get_paper_text</span><span class="p">(</span><span class="n">data</span><span class="p">),</span>
-        <span class="n">keyphrase_ngram_range</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
-        <span class="n">top_n</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
-        <span class="n">stop_words</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="k">return</span> <span class="p">[</span><span class="o">*</span><span class="n">title_keywords</span><span class="p">,</span> <span class="o">*</span><span class="n">abstract_keywords</span><span class="p">,</span> <span class="o">*</span><span class="n">text_keywords</span><span class="p">]</span>
 
 
 <div class="viewcode-block" id="parse_grobid_data">
 <a class="viewcode-back" href="../../papers_without_code.html#papers_without_code.processing.parse_grobid_data">[docs]</a>
 <span class="k">def</span> <span class="nf">parse_grobid_data</span><span class="p">(</span>
-    <span class="n">grobid_data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+    <span class="n">grobid_data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MinimalPaperDetails</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Parse GROBID data into a bit more useful form.</span>
@@ -310,12 +264,17 @@
 <span class="sd">    MinimalPaperDetails</span>
 <span class="sd">        The parsed GROBID data.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Construct keyword content</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">_get_title</span><span class="p">(</span><span class="n">grobid_data</span><span class="p">)</span>
+    <span class="n">abstract</span> <span class="o">=</span> <span class="n">_get_abstract</span><span class="p">(</span><span class="n">grobid_data</span><span class="p">)</span>
+    <span class="n">keywords</span> <span class="o">=</span> <span class="n">_get_keywords</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="se">\n\n</span><span class="si">{</span><span class="n">abstract</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
     <span class="c1"># Parse</span>
     <span class="k">return</span> <span class="n">MinimalPaperDetails</span><span class="p">(</span>
-        <span class="n">title</span><span class="o">=</span><span class="n">_get_title</span><span class="p">(</span><span class="n">grobid_data</span><span class="p">),</span>
+        <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
         <span class="n">authors</span><span class="o">=</span><span class="n">_get_authors</span><span class="p">(</span><span class="n">grobid_data</span><span class="p">),</span>
-        <span class="n">abstract</span><span class="o">=</span><span class="n">_get_abstract</span><span class="p">(</span><span class="n">grobid_data</span><span class="p">),</span>
-        <span class="n">keywords</span><span class="o">=</span><span class="n">_get_keywords_from_bert</span><span class="p">(</span><span class="n">grobid_data</span><span class="p">),</span>
+        <span class="n">abstract</span><span class="o">=</span><span class="n">abstract</span><span class="p">,</span>
+        <span class="n">keywords</span><span class="o">=</span><span class="n">keywords</span><span class="p">,</span>
     <span class="p">)</span></div>
 
 </pre></div>
@@ -350,7 +309,7 @@
       
     </aside>
   </div>
-</div><script src="../../_static/documentation_options.js?v=67c8eaf3"></script>
+</div><script src="../../_static/documentation_options.js?v=81b950bc"></script>
     <script src="../../_static/doctools.js?v=888ff710"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/scripts/furo.js?v=32e29ea5"></script>

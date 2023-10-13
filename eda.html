@@ -15084,7 +15084,7 @@ class="
 
 <span class="c1"># Attempt to find repos for each paper and sort their results</span>
 <span class="n">matching_results_benchmark_rows</span> <span class="o">=</span> <span class="p">[]</span>
-<span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">code_found</span><span class="o">.</span><span class="n">iterrows</span><span class="p">()):</span>
+<span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">code_found</span><span class="o">.</span><span class="n">iterrows</span><span class="p">(),</span> <span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">code_found</span><span class="p">)):</span>
     <span class="c1"># Prepend the search with arxiv</span>
     <span class="n">paper_repo_results</span> <span class="o">=</span> <span class="n">search_for_repos</span><span class="p">(</span><span class="sa">f</span><span class="s2">"arxiv:</span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
@@ -15138,73 +15138,38 @@ class="
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr">
-<pre>/opt/hostedtoolcache/Python/3.10.13/x64/lib/python3.10/site-packages/tqdm/auto.py:21: TqdmWarning: IProgress not found. Please update jupyter and ipywidgets. See https://ipywidgets.readthedocs.io/en/stable/user_install.html
+<pre>/opt/hostedtoolcache/Python/3.11.5/x64/lib/python3.11/site-packages/tqdm/auto.py:21: TqdmWarning: IProgress not found. Please update jupyter and ipywidgets. See https://ipywidgets.readthedocs.io/en/stable/user_install.html
   from .autonotebook import tqdm as notebook_tqdm
-0it [00:00, ?it/s]
-Downloading (…)c5f37/.gitattributes: 100%|██████████| 690/690 [00:00&lt;00:00, 2.17MB/s]
+  0%|          | 0/13 [00:00&lt;?, ?it/s]
+Downloading (…)9cf89/.gitattributes: 100%|██████████| 1.52k/1.52k [00:00&lt;00:00, 4.88MB/s]
 
-Downloading (…)_Pooling/config.json: 100%|██████████| 190/190 [00:00&lt;00:00, 747kB/s]
+Downloading (…)_Pooling/config.json: 100%|██████████| 190/190 [00:00&lt;00:00, 463kB/s]
 
-Downloading (…)c4e65c5f37/README.md: 100%|██████████| 2.71k/2.71k [00:00&lt;00:00, 9.17MB/s]
+Downloading (…)a1bfc9cf89/README.md: 100%|██████████| 68.1k/68.1k [00:00&lt;00:00, 119MB/s]
 
-Downloading (…)e65c5f37/config.json: 100%|██████████| 622/622 [00:00&lt;00:00, 2.99MB/s]
+Downloading (…)bfc9cf89/config.json: 100%|██████████| 583/583 [00:00&lt;00:00, 1.67MB/s]
 
-Downloading (…)ce_transformers.json: 100%|██████████| 122/122 [00:00&lt;00:00, 423kB/s]
+Downloading model.safetensors:   0%|          | 0.00/66.7M [00:00&lt;?, ?B/s]
+Downloading model.safetensors:  31%|███▏      | 21.0M/66.7M [00:00&lt;00:00, 153MB/s]
+Downloading model.safetensors: 100%|██████████| 66.7M/66.7M [00:00&lt;00:00, 187MB/s]
 
-Downloading pytorch_model.bin:   0%|          | 0.00/440M [00:00&lt;?, ?B/s]
-Downloading pytorch_model.bin:   5%|▍         | 21.0M/440M [00:00&lt;00:02, 176MB/s]
-Downloading pytorch_model.bin:  10%|▉         | 41.9M/440M [00:00&lt;00:02, 187MB/s]
-Downloading pytorch_model.bin:  17%|█▋        | 73.4M/440M [00:00&lt;00:01, 218MB/s]
-Downloading pytorch_model.bin:  24%|██▍       | 105M/440M [00:00&lt;00:01, 238MB/s] 
-Downloading pytorch_model.bin:  31%|███       | 136M/440M [00:00&lt;00:01, 248MB/s]
-Downloading pytorch_model.bin:  38%|███▊      | 168M/440M [00:00&lt;00:01, 257MB/s]
-Downloading pytorch_model.bin:  45%|████▌     | 199M/440M [00:00&lt;00:00, 268MB/s]
-Downloading pytorch_model.bin:  52%|█████▏    | 231M/440M [00:00&lt;00:00, 276MB/s]
-Downloading pytorch_model.bin:  60%|█████▉    | 262M/440M [00:01&lt;00:00, 275MB/s]
-Downloading pytorch_model.bin:  67%|██████▋   | 294M/440M [00:01&lt;00:00, 278MB/s]
-Downloading pytorch_model.bin:  74%|███████▍  | 325M/440M [00:01&lt;00:00, 281MB/s]
-Downloading pytorch_model.bin:  81%|████████  | 357M/440M [00:01&lt;00:00, 277MB/s]
-Downloading pytorch_model.bin:  88%|████████▊ | 388M/440M [00:01&lt;00:00, 281MB/s]
-Downloading pytorch_model.bin: 100%|██████████| 440M/440M [00:01&lt;00:00, 264MB/s]
+Downloading pytorch_model.bin:   0%|          | 0.00/66.8M [00:00&lt;?, ?B/s]
+Downloading pytorch_model.bin:  47%|████▋     | 31.5M/66.8M [00:00&lt;00:00, 224MB/s]
+Downloading pytorch_model.bin: 100%|██████████| 66.8M/66.8M [00:00&lt;00:00, 221MB/s]
 
-Downloading (…)nce_bert_config.json: 100%|██████████| 53.0/53.0 [00:00&lt;00:00, 171kB/s]
+Downloading (…)nce_bert_config.json: 100%|██████████| 57.0/57.0 [00:00&lt;00:00, 212kB/s]
 
-Downloading (…)cial_tokens_map.json: 100%|██████████| 112/112 [00:00&lt;00:00, 383kB/s]
+Downloading (…)cial_tokens_map.json: 100%|██████████| 125/125 [00:00&lt;00:00, 558kB/s]
 
-Downloading (…)c5f37/tokenizer.json: 100%|██████████| 462k/462k [00:00&lt;00:00, 70.9MB/s]
+Downloading (…)9cf89/tokenizer.json:   0%|          | 0.00/712k [00:00&lt;?, ?B/s]
+Downloading (…)9cf89/tokenizer.json: 100%|██████████| 712k/712k [00:00&lt;00:00, 2.71MB/s]
 
-Downloading (…)okenizer_config.json: 100%|██████████| 331/331 [00:00&lt;00:00, 1.73MB/s]
+Downloading (…)okenizer_config.json: 100%|██████████| 394/394 [00:00&lt;00:00, 1.43MB/s]
 
-Downloading (…)c4e65c5f37/vocab.txt: 100%|██████████| 222k/222k [00:00&lt;00:00, 322MB/s]
+Downloading (…)a1bfc9cf89/vocab.txt: 100%|██████████| 232k/232k [00:00&lt;00:00, 3.61MB/s]
 
-Downloading (…)65c5f37/modules.json: 100%|██████████| 229/229 [00:00&lt;00:00, 1.26MB/s]
-/opt/hostedtoolcache/Python/3.10.13/x64/lib/python3.10/site-packages/ghapi/core.py:102: UserWarning: Neither GITHUB_TOKEN nor GITHUB_JWT_TOKEN found: running as unauthenticated
-  else: warn(&#39;Neither GITHUB_TOKEN nor GITHUB_JWT_TOKEN found: running as unauthenticated&#39;)
-1it [00:17, 17.74s/it]/opt/hostedtoolcache/Python/3.10.13/x64/lib/python3.10/site-packages/ghapi/core.py:102: UserWarning: Neither GITHUB_TOKEN nor GITHUB_JWT_TOKEN found: running as unauthenticated
-  else: warn(&#39;Neither GITHUB_TOKEN nor GITHUB_JWT_TOKEN found: running as unauthenticated&#39;)
-2it [01:55, 64.78s/it]/opt/hostedtoolcache/Python/3.10.13/x64/lib/python3.10/site-packages/ghapi/core.py:102: UserWarning: Neither GITHUB_TOKEN nor GITHUB_JWT_TOKEN found: running as unauthenticated
-  else: warn(&#39;Neither GITHUB_TOKEN nor GITHUB_JWT_TOKEN found: running as unauthenticated&#39;)
-3it [02:23, 47.91s/it]/opt/hostedtoolcache/Python/3.10.13/x64/lib/python3.10/site-packages/ghapi/core.py:102: UserWarning: Neither GITHUB_TOKEN nor GITHUB_JWT_TOKEN found: running as unauthenticated
-  else: warn(&#39;Neither GITHUB_TOKEN nor GITHUB_JWT_TOKEN found: running as unauthenticated&#39;)
-4it [04:51, 87.44s/it]/opt/hostedtoolcache/Python/3.10.13/x64/lib/python3.10/site-packages/ghapi/core.py:102: UserWarning: Neither GITHUB_TOKEN nor GITHUB_JWT_TOKEN found: running as unauthenticated
-  else: warn(&#39;Neither GITHUB_TOKEN nor GITHUB_JWT_TOKEN found: running as unauthenticated&#39;)
-5it [06:10, 84.52s/it]/opt/hostedtoolcache/Python/3.10.13/x64/lib/python3.10/site-packages/ghapi/core.py:102: UserWarning: Neither GITHUB_TOKEN nor GITHUB_JWT_TOKEN found: running as unauthenticated
-  else: warn(&#39;Neither GITHUB_TOKEN nor GITHUB_JWT_TOKEN found: running as unauthenticated&#39;)
-6it [08:43, 107.72s/it]/opt/hostedtoolcache/Python/3.10.13/x64/lib/python3.10/site-packages/ghapi/core.py:102: UserWarning: Neither GITHUB_TOKEN nor GITHUB_JWT_TOKEN found: running as unauthenticated
-  else: warn(&#39;Neither GITHUB_TOKEN nor GITHUB_JWT_TOKEN found: running as unauthenticated&#39;)
-7it [10:20, 104.23s/it]/opt/hostedtoolcache/Python/3.10.13/x64/lib/python3.10/site-packages/ghapi/core.py:102: UserWarning: Neither GITHUB_TOKEN nor GITHUB_JWT_TOKEN found: running as unauthenticated
-  else: warn(&#39;Neither GITHUB_TOKEN nor GITHUB_JWT_TOKEN found: running as unauthenticated&#39;)
-8it [10:42, 77.91s/it] /opt/hostedtoolcache/Python/3.10.13/x64/lib/python3.10/site-packages/ghapi/core.py:102: UserWarning: Neither GITHUB_TOKEN nor GITHUB_JWT_TOKEN found: running as unauthenticated
-  else: warn(&#39;Neither GITHUB_TOKEN nor GITHUB_JWT_TOKEN found: running as unauthenticated&#39;)
-9it [11:27, 67.64s/it]/opt/hostedtoolcache/Python/3.10.13/x64/lib/python3.10/site-packages/ghapi/core.py:102: UserWarning: Neither GITHUB_TOKEN nor GITHUB_JWT_TOKEN found: running as unauthenticated
-  else: warn(&#39;Neither GITHUB_TOKEN nor GITHUB_JWT_TOKEN found: running as unauthenticated&#39;)
-10it [12:46, 71.32s/it]/opt/hostedtoolcache/Python/3.10.13/x64/lib/python3.10/site-packages/ghapi/core.py:102: UserWarning: Neither GITHUB_TOKEN nor GITHUB_JWT_TOKEN found: running as unauthenticated
-  else: warn(&#39;Neither GITHUB_TOKEN nor GITHUB_JWT_TOKEN found: running as unauthenticated&#39;)
-11it [14:04, 73.34s/it]/opt/hostedtoolcache/Python/3.10.13/x64/lib/python3.10/site-packages/ghapi/core.py:102: UserWarning: Neither GITHUB_TOKEN nor GITHUB_JWT_TOKEN found: running as unauthenticated
-  else: warn(&#39;Neither GITHUB_TOKEN nor GITHUB_JWT_TOKEN found: running as unauthenticated&#39;)
-12it [14:08, 52.36s/it]/opt/hostedtoolcache/Python/3.10.13/x64/lib/python3.10/site-packages/ghapi/core.py:102: UserWarning: Neither GITHUB_TOKEN nor GITHUB_JWT_TOKEN found: running as unauthenticated
-  else: warn(&#39;Neither GITHUB_TOKEN nor GITHUB_JWT_TOKEN found: running as unauthenticated&#39;)
-13it [18:56, 87.43s/it] 
+Downloading (…)fc9cf89/modules.json: 100%|██████████| 385/385 [00:00&lt;00:00, 1.78MB/s]
+100%|██████████| 13/13 [03:13&lt;00:00, 14.90s/it]
 </pre>
 </div>
 </div>
@@ -15221,9 +15186,7 @@ Downloading (…)65c5f37/modules.json: 100%|██████████| 229/
 <div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[9]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">matching_results_benchmark</span><span class="p">[</span>
-    <span class="n">matching_results_benchmark</span><span class="o">.</span><span class="n">match</span> <span class="o">!=</span> <span class="s2">"not found"</span>
-<span class="p">][[</span><span class="s2">"id"</span><span class="p">,</span> <span class="s2">"code_repository_linked_in_paper"</span><span class="p">,</span> <span class="s2">"match"</span><span class="p">]]</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">matching_results_benchmark</span><span class="p">[[</span><span class="s2">"id"</span><span class="p">,</span> <span class="s2">"code_repository_linked_in_paper"</span><span class="p">,</span> <span class="s2">"match"</span><span class="p">]]</span>
 </pre></div>
 
      </div>
@@ -15271,6 +15234,12 @@ Downloading (…)65c5f37/modules.json: 100%|██████████| 229/
   </thead>
   <tbody>
     <tr>
+      <th>0</th>
+      <td>2101.10263</td>
+      <td>no</td>
+      <td>not found</td>
+    </tr>
+    <tr>
       <th>4</th>
       <td>1803.09565</td>
       <td>yes</td>
@@ -15280,7 +15249,7 @@ Downloading (…)65c5f37/modules.json: 100%|██████████| 229/
       <th>5</th>
       <td>2202.13538</td>
       <td>yes</td>
-      <td>top three</td>
+      <td>first</td>
     </tr>
     <tr>
       <th>6</th>
@@ -15292,7 +15261,7 @@ Downloading (…)65c5f37/modules.json: 100%|██████████| 229/
       <th>9</th>
       <td>1706.07119</td>
       <td>yes</td>
-      <td>first</td>
+      <td>not found</td>
     </tr>
     <tr>
       <th>10</th>
@@ -15301,16 +15270,46 @@ Downloading (…)65c5f37/modules.json: 100%|██████████| 229/
       <td>first</td>
     </tr>
     <tr>
+      <th>11</th>
+      <td>2110.06912</td>
+      <td>no</td>
+      <td>not found</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>2205.04892</td>
+      <td>no</td>
+      <td>not found</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>1501.05151</td>
+      <td>no</td>
+      <td>not found</td>
+    </tr>
+    <tr>
       <th>16</th>
       <td>2007.10100</td>
       <td>no</td>
-      <td>first</td>
+      <td>top three</td>
     </tr>
     <tr>
       <th>19</th>
       <td>2110.05877</td>
       <td>yes</td>
       <td>first</td>
+    </tr>
+    <tr>
+      <th>21</th>
+      <td>2202.06443</td>
+      <td>yes</td>
+      <td>not found</td>
+    </tr>
+    <tr>
+      <th>22</th>
+      <td>2111.12485</td>
+      <td>yes</td>
+      <td>not found</td>
     </tr>
   </tbody>
 </table>
