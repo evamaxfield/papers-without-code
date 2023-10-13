@@ -1,31 +1,29 @@
 #!/usr/bin/env python
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple, Union
-
-if TYPE_CHECKING:
-    from pathlib import Path
+from pathlib import Path
+from typing import Any
 
 ###############################################################################
 
 
-PathLike = Union[str, "Path"]
+PathLike = str | Path
 
 ###############################################################################
 
 
 @dataclass
 class AuthorDetails:
-    name_parts: List[str]
-    email: Optional[str]
-    affiliation: Optional[str]
+    name_parts: list[str]
+    email: str | None
+    affiliation: str | None
 
 
 @dataclass
 class MinimalPaperDetails:
     title: str
-    authors: List[AuthorDetails]
+    authors: list[AuthorDetails]
     abstract: str
-    url: Optional[str] = None
-    keywords: Optional[List[Tuple[str, float]]] = None
-    other: Optional[Dict[str, Any]] = None
+    url: str | None = None
+    keywords: list[str] | None = None
+    other: dict[str, Any] | None = None

@@ -22,20 +22,11 @@ clean:
 
 # install with all deps
 install:
-	pip install -e '.[grobid,lint,test,docs,dev]'
+	pip install -e '.[grobid,lint,docs,dev]'
 
 # lint, format, and check all files
 lint:
 	pre-commit run --all-files
-
-# run tests
-test:
-	pytest --cov-report xml --cov-report html --cov=papers_without_code papers_without_code/tests
-
-# run lint and then run tests
-build:
-	just lint
-	just test
 
 # generate Sphinx HTML documentation
 generate-docs:
@@ -153,7 +144,16 @@ build-docker:
 
 # run docker image locally
 run-docker:
-	docker run --rm -p 9090:8080 -e PORT=8080 pwoc-web-app
+	docker run \
+		--rm \
+		-p 9090:8080 \
+		-e PORT=8080 \
+		-e GITHUB_TOKEN={{env_var("GITHUB_TOKEN")}} \
+		-e OPENAI_API_KEY={{env_var("OPENAI_API_KEY")}} \
+		pwoc-web-app
+
+run-docker-it:
+	docker run --rm -it pwoc-web-app bash
 
 # enable gcloud services
 enable-services:
@@ -172,4 +172,6 @@ deploy project=default_project region=default_region:
 		--region {{region}} \
 		--allow-unauthenticated \
 		--memory 4Gi \
-		--update-env-vars GITHUB_TOKEN={{env_var("GITHUB_TOKEN")}}
+		--update-env-vars \
+			GITHUB_TOKEN={{env_var("GITHUB_TOKEN")}} \
+			OPENAI_API_KEY={{env_var("OPENAI_API_KEY")}}

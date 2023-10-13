@@ -3,7 +3,7 @@
 
 # Use the official lightweight Python image.
 # https://hub.docker.com/_/python
-FROM python:3.10-slim
+FROM python:3.11-slim
 
 # Allow statements and log messages to immediately appear in the Knative logs
 ENV PYTHONUNBUFFERED True
@@ -14,16 +14,13 @@ WORKDIR $APP_HOME
 COPY . ./
 
 # Install git and tree
-RUN apt-get -y update && apt-get -y install git tree
+RUN apt-get -y update && apt-get -y install git
 
 # Install dependencies.
 RUN pip install --no-cache-dir .
 
 # Download / pre-cache model
 RUN python scripts/cache-sentence-transformers-model.py
-
-# Show all files to verify what is in the image
-RUN tree
 
 # Run the web server on startup
 CMD pwoc-web-app

@@ -1,13 +1,12 @@
 #!/usr/bin/env python
 
 import itertools
+import json
 import logging
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from functools import partial
 from pathlib import Path
-from random import sample
-from typing import List, Optional, Tuple
 
 import backoff
 import requests
@@ -16,7 +15,11 @@ from dataclasses_json import DataClassJsonMixin
 from dotenv import load_dotenv
 from fastcore.net import HTTP4xxClientError
 from ghapi.all import GhApi
-from keybert import KeyBERT
+from langchain import PromptTemplate
+from langchain.chat_models import ChatOpenAI
+from langchain.output_parsers import PydanticOutputParser
+from langchain.schema import HumanMessage
+from pydantic import BaseModel, Field
 from requests.exceptions import HTTPError
 from sentence_transformers import SentenceTransformer, util
 
@@ -28,7 +31,7 @@ log = logging.getLogger(__name__)
 
 ###############################################################################
 
-DEFAULT_TRANSFORMER_MODEL = "allenai-specter"
+DEFAULT_TRANSFORMER_MODEL = "thenlper/gte-small"
 DEFAULT_LOCAL_CACHE_MODEL = f"./sentence-transformers_{DEFAULT_TRANSFORMER_MODEL}"
 
 ###############################################################################
@@ -63,11 +66,12 @@ def get_paper(query: str) -> MinimalPaperDetails:
     log.info(f"Getting SemanticScholar paper details with query: '{query}'")
     response = requests.get(
         f"https://api.semanticscholar.org/graph/v1/paper/{query.strip()}"
+        "?fields=paperId,title,authors,abstract"
     )
     response.raise_for_status()
     response_data = response.json()
-    log.info(response_data)
     log.info(f"Found SemanticScholar paper with query: '{query}'")
+    log.info(f"Response data: {response_data}")
 
     # Handle no paper found
     if len(response_data) == 0:
@@ -83,27 +87,82 @@ def get_paper(query: str) -> MinimalPaperDetails:
     )
 
 
-def _get_keywords(
-    text: str,
-    stop_words: Optional[str] = "english",
-    keyphrase_ngram_range: Tuple[int, int] = (3, 4),
-    top_n: int = 3,
-    model: Optional[KeyBERT] = None,
-) -> List[Tuple[str, float]]:
-    # Load model
-    if not model:
-        potential_cache_dir = Path(DEFAULT_LOCAL_CACHE_MODEL).resolve()
-        if potential_cache_dir.exists():
-            model = KeyBERT(str(potential_cache_dir))
-        else:
-            model = KeyBERT(DEFAULT_TRANSFORMER_MODEL)
-
-    return model.extract_keywords(
-        text,
-        keyphrase_ngram_range=keyphrase_ngram_range,
-        top_n=top_n,
-        stop_words=stop_words,
+class LLMKeywordResults(BaseModel):
+    keywords: list[str] = Field(
+        description=("Extracted keyword sequences found in the text.")
     )
+
+
+LLM_KEYWORD_RESULTS_PARSER = PydanticOutputParser(pydantic_object=LLMKeywordResults)
+
+LLM_KEYWORD_PROMPT_STRING = (
+    "Task: Create a list of five keywords from the following text. "
+    "Keywords can range from one to four words in length. "
+    "Only extracted text should be included in the list of keywords. "
+    "Keywords can include acronyms and abbreviations.\n\n"
+    "{{ format_instructions }}"
+    "\n\n---\n\n"
+    "Example Input Text:\n\n"
+    "SciBERT: A Pretrained Language Model for Scientific Text "
+    "Obtaining large-scale annotated data for NLP tasks in the "
+    "scientific domain is challenging and expensive. We release SciBERT, "
+    "a pretrained language model based on BERT (Devlin et. al., 2018) "
+    "to address the lack of high-quality, large-scale labeled scientific data. "
+    "SciBERT leverages unsupervised pretraining on a large multi-domain corpus of "
+    "scientific publications to improve performance on downstream scientific "
+    "NLP tasks. We evaluate on a suite of tasks including sequence tagging, "
+    "sentence classification and dependency parsing, with datasets from a "
+    "variety of scientific domains. We demonstrate statistically significant "
+    "improvements over BERT and achieve new state-of-the-art results on several "
+    "of these tasks. The code and pretrained models are available at "
+    "https://github.com/allenai/scibert/."
+    "\n\n---\n\n"
+    "Example Output Text:\n\n"
+    '{"keywords": ['
+    '"SciBERT", '
+    '"Language Model for Scientific Text", '
+    '"large-scale labeled scientific data", '
+    '"Scientific Text", '
+    '"SciBERT leverages unsupervised pretraining"'
+    "]}"
+    "\n\n---\n\n"
+    "Input Text:\n\n{{ text }}"
+    "\n\n---\n\n"
+)
+
+LLM_KEYWORD_PROMPT_TEMPLATE = PromptTemplate.from_template(
+    LLM_KEYWORD_PROMPT_STRING,
+    template_format="jinja2",
+)
+
+backoff.on_exception(backoff.expo, exception=json.JSONDecodeError, max_time=10)
+
+
+def _run_keyword_get_from_llm(text: str, llm: ChatOpenAI) -> LLMKeywordResults:
+    # Fill prompt to get input
+    input_ = LLM_KEYWORD_PROMPT_TEMPLATE.format_prompt(
+        text=text,
+        format_instructions=LLM_KEYWORD_RESULTS_PARSER.get_format_instructions(),
+    )
+
+    # Generate keywords
+    output = llm([HumanMessage(content=input_.text)]).content.strip()
+
+    # Parse output
+    parsed_output = LLM_KEYWORD_RESULTS_PARSER.parse(output)
+
+    return parsed_output
+
+
+def _get_keywords(text: str) -> list[str]:
+    # Create connection to LLM
+    llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0, max_tokens=1000)
+
+    # Get keywords
+    parsed_output = _run_keyword_get_from_llm(text, llm)
+
+    # Return keywords
+    return parsed_output.keywords
 
 
 @dataclass
@@ -125,7 +184,7 @@ class SearchQueryResponse:
 @backoff.on_exception(backoff.expo, HTTP4xxClientError)
 def _search_repos(
     query: SearchQueryDataTracker, api: GhApi
-) -> List[SearchQueryResponse]:
+) -> list[SearchQueryResponse]:
     # Make request
     if query.strict:
         response = api(
@@ -182,7 +241,7 @@ class RepoReadmeResponse:
 @backoff.on_exception(backoff.expo, HTTPError, max_time=60)
 def _get_repo_readme_content(
     repo_data: SearchQueryResponse,
-) -> Optional[RepoReadmeResponse]:
+) -> RepoReadmeResponse | None:
     # Request repo page
     response = requests.get(f"https://github.com/{repo_data.repo_name}")
     response.raise_for_status()
@@ -219,10 +278,10 @@ class RepoDetails(DataClassJsonMixin):
 
 
 def _semantic_sim_repos(
-    all_repos_details: List[RepoReadmeResponse],
+    all_repos_details: list[RepoReadmeResponse],
     paper: MinimalPaperDetails,
-    model: Optional[SentenceTransformer] = None,
-) -> List[RepoDetails]:
+    model: SentenceTransformer | None = None,
+) -> list[RepoDetails]:
     # Load model
     if not model:
         potential_cache_dir = Path(DEFAULT_LOCAL_CACHE_MODEL).resolve()
@@ -262,9 +321,8 @@ def _semantic_sim_repos(
 
 def get_repos(
     paper: MinimalPaperDetails,
-    loaded_keybert: Optional[KeyBERT] = None,
-    loaded_sent_transformer: Optional[SentenceTransformer] = None,
-) -> List[RepoDetails]:
+    loaded_sent_transformer: SentenceTransformer | None = None,
+) -> list[RepoDetails]:
     """
     Try to find GitHub repositories matching a provided paper.
 
@@ -272,9 +330,6 @@ def get_repos(
     ----------
     paper: MinimalPaperDetails
         The paper to try and find similar repositories to.
-    loaded_keybert: Optional[KeyBERT]
-        An optional preloaded KeyBERT model to use instead of loading a new one.
-        Default: None
     loaded_sent_transformer: Optional[SentenceTransformer]
         An optional preloaded SentenceTransformer model to use
         instead of loading a new one.
@@ -282,7 +337,7 @@ def get_repos(
 
     Returns
     -------
-    List[RepoDetails]
+    list[RepoDetails]
         A list of repositories that are similar to the paper,
         sorted by each repositories README's semantic similarity
         to the abstract (or title if no abstract was attached to the paper details).
@@ -296,115 +351,37 @@ def get_repos(
     # No keywords were provided, generate from abstract and title
     if not paper.keywords:
         # Get all the queries we want to run
-        if paper.title:
-            title_subset = [
-                SearchQueryDataTracker(
-                    query_str=" ".join(paper.title.split(" ")[:3]),
-                    strict=True,
-                )
-            ]
-            title_general_keywords = [
-                SearchQueryDataTracker(
-                    query_str=word,
-                    strict=False,
-                )
-                for word, _ in _get_keywords(
-                    paper.title,
-                    model=loaded_keybert,
-                    # stop_words=None,
-                )
-            ]
-            title_strict_keywords = [
-                SearchQueryDataTracker(
-                    query_str=word,
-                    strict=True,
-                )
-                for word, _ in _get_keywords(
-                    paper.title,
-                    model=loaded_keybert,
-                    keyphrase_ngram_range=(1, 3),
-                    stop_words=None,
-                )
-            ]
-        else:
-            title_subset = []
-            title_general_keywords = []
-            title_strict_keywords = []
+        if paper.title and paper.abstract:
+            paper_content = f"{paper.title}\n\n{paper.abstract}"
+        elif paper.title:
+            paper_content = paper.title
+        elif paper.abstract:
+            paper_content = paper.abstract
 
-        if paper.abstract:
-            abstract_general_keywords = [
-                SearchQueryDataTracker(
-                    query_str=word,
-                    strict=False,
-                )
-                for word, _ in _get_keywords(
-                    paper.abstract,
-                    model=loaded_keybert,
-                    # stop_words=None,
-                )
-            ]
-            abstract_strict_keywords = [
-                SearchQueryDataTracker(
-                    query_str=word,
-                    strict=True,
-                )
-                for word, _ in _get_keywords(
-                    paper.abstract,
-                    model=loaded_keybert,
-                    keyphrase_ngram_range=(2, 3),
-                    stop_words=None,
-                )
-            ]
-        else:
-            abstract_general_keywords = []
-            abstract_strict_keywords = []
-
-        # Reduce in case of duplicates
-        all_query_datas = [
-            *title_subset,
-            *title_general_keywords,
-            *title_strict_keywords,
-            *abstract_general_keywords,
-            *abstract_strict_keywords,
-        ]
-        set_queries = []
-        set_query_strs = set()
-        for qd in all_query_datas:
-            if qd.query_str not in set_query_strs:
-                set_queries.append(qd)
-                set_query_strs.add(qd.query_str)
-
-        # Add random sample combinations of query strs
-        sampled_combinations = sample(
-            list(
-                itertools.combinations(
-                    set_queries,
-                    2,
-                )
-            ),
-            k=3,
+        # Get keywords
+        log.info("Right before keyword search...")
+        keywords = _get_keywords(
+            paper_content,
         )
+        log.info("Right after keywords search...")
 
-        # Unpack the sampled combinations
-        for a, b in sampled_combinations:
-            # Handle joint strictness
-            wrapped_a = f'"{a.query_str}"' if a.strict else a.query_str
-            wrapped_b = f'"{b.query_str}"' if b.strict else b.query_str
-            set_queries.append(
-                SearchQueryDataTracker(
-                    query_str=f"{wrapped_a} {wrapped_b}",
-                    strict=False,
-                )
+        # Create the queries
+        set_queries = [
+            SearchQueryDataTracker(
+                query_str=keyword,
+                strict=True,
             )
+            for keyword in keywords
+        ]
 
     # Paper was provided with keywords, use those
     else:
         set_queries = [
             SearchQueryDataTracker(
-                query_str=word,
+                query_str=keyword,
                 strict=True,
             )
-            for word, _ in paper.keywords
+            for keyword in paper.keywords
         ]
 
     # Progress info

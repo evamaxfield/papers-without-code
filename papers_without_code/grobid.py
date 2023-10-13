@@ -4,7 +4,7 @@ import logging
 import os
 import time
 from pathlib import Path
-from typing import Any, Dict, Optional, Tuple, Union
+from typing import Any
 
 import docker
 import requests
@@ -27,12 +27,12 @@ DEFAULT_GROBID_CLIENT_KWS = {"timeout": 120}
 
 
 def setup_or_connect_to_server(  # noqa: C901
-    image: Optional[str] = None,
-    port: Optional[int] = None,
-    grobid_client_kws: Union[Dict[str, Any], None] = None,
-) -> Tuple[Optional[GrobidClient], docker.models.containers.Container]:
+    image: str | None = None,
+    port: int | None = None,
+    grobid_client_kws: dict[str, Any] | None = None,
+) -> tuple[GrobidClient | None, docker.models.containers.Container]:
     """
-    Setup (or connect to) a GROBID server managed via a local Docker container.
+    Set up or create a connection to a GROBID server.
 
     Parameters
     ----------
@@ -160,7 +160,7 @@ def teardown_server(
 def process_pdf(
     client: GrobidClient,
     pdf_path: PathLike,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Process a PDF file using a GROBID client.
 

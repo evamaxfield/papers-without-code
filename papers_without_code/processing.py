@@ -1,11 +1,10 @@
 #!/usr/bin/env python
 
 import logging
-from typing import Any, Dict, List, Tuple
-
-from keybert import KeyBERT
+from typing import Any
 
 from .custom_types import AuthorDetails, MinimalPaperDetails
+from .search import _get_keywords
 
 ###############################################################################
 
@@ -14,13 +13,13 @@ log = logging.getLogger(__name__)
 ###############################################################################
 
 
-def _get_title(data: Dict[str, Any]) -> str:
+def _get_title(data: dict[str, Any]) -> str:
     return data["teiHeader"]["fileDesc"]["sourceDesc"]["biblStruct"]["analytic"][
         "title"
     ]["#text"]
 
 
-def _get_authors(data: Dict[str, Any]) -> List[AuthorDetails]:
+def _get_authors(data: dict[str, Any]) -> list[AuthorDetails]:
     authors = []
     authors_list_data = data["teiHeader"]["fileDesc"]["sourceDesc"]["biblStruct"][
         "analytic"
@@ -40,57 +39,12 @@ def _get_authors(data: Dict[str, Any]) -> List[AuthorDetails]:
     return authors
 
 
-def _get_abstract(data: Dict[str, Any]) -> str:
+def _get_abstract(data: dict[str, Any]) -> str:
     return data["teiHeader"]["profileDesc"]["abstract"]["div"]["p"]
 
 
-def _get_keywords_from_authors(data: Dict[str, Any]) -> List[str]:
-    return data["teiHeader"]["profileDesc"]["textClass"]["keywords"]["term"]
-
-
-def _get_paper_text(data: Dict[str, Any]) -> str:
-    text_segments = []
-    for div in data["text"]["body"]["div"]:
-        if isinstance(div["p"], str):
-            text_segments.append(div["p"])
-        else:
-            for para in div["p"]:
-                if isinstance(para, str):
-                    text_segments.append(para)
-                else:
-                    text_segments.append(para["#text"])
-
-    return " ".join(text_segments)
-
-
-def _get_keywords_from_bert(data: Dict[str, Any]) -> List[Tuple[str, float]]:
-    # Get model
-    model = KeyBERT()
-
-    # Extract keywords from title
-    title_keywords = model.extract_keywords(
-        _get_title(data),
-        keyphrase_ngram_range=(3, 4),
-        top_n=5,
-        stop_words=None,
-    )
-    abstract_keywords = model.extract_keywords(
-        _get_abstract(data),
-        keyphrase_ngram_range=(3, 4),
-        top_n=5,
-        stop_words=None,
-    )
-    text_keywords = model.extract_keywords(
-        _get_paper_text(data),
-        keyphrase_ngram_range=(3, 4),
-        top_n=5,
-        stop_words=None,
-    )
-    return [*title_keywords, *abstract_keywords, *text_keywords]
-
-
 def parse_grobid_data(
-    grobid_data: Dict[str, Any],
+    grobid_data: dict[str, Any],
 ) -> MinimalPaperDetails:
     """
     Parse GROBID data into a bit more useful form.
@@ -105,10 +59,15 @@ def parse_grobid_data(
     MinimalPaperDetails
         The parsed GROBID data.
     """
+    # Construct keyword content
+    title = _get_title(grobid_data)
+    abstract = _get_abstract(grobid_data)
+    keywords = _get_keywords(f"{title}\n\n{abstract}")
+
     # Parse
     return MinimalPaperDetails(
-        title=_get_title(grobid_data),
+        title=title,
         authors=_get_authors(grobid_data),
-        abstract=_get_abstract(grobid_data),
-        keywords=_get_keywords_from_bert(grobid_data),
+        abstract=abstract,
+        keywords=keywords,
     )

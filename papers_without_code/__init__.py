@@ -3,9 +3,7 @@
 import logging
 from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
-from typing import List
 
-from keybert import KeyBERT
 from sentence_transformers import SentenceTransformer
 
 from . import custom_types, processing, search
@@ -86,7 +84,7 @@ def _get_paper_from_file(
 
 def search_for_repos(
     query_or_path: str, teardown: bool = False
-) -> List[search.RepoDetails]:
+) -> list[search.RepoDetails]:
     """
     Query for a paper then find similar GitHub repositories to that paper.
 
@@ -107,7 +105,7 @@ def search_for_repos(
 
     Returns
     -------
-    List[search.RepoDetails]
+    list[search.RepoDetails]
         A list of repositories that are similar to the paper,
         sorted by each repositories README's semantic similarity
         to the abstract (or title if no abstract was attached to the paper details).
@@ -136,13 +134,10 @@ def search_for_repos(
     potential_cache_dir = Path(search.DEFAULT_LOCAL_CACHE_MODEL).resolve()
     if potential_cache_dir.exists():
         loaded_sent_transformer = SentenceTransformer(str(potential_cache_dir))
-        loaded_keybert = KeyBERT(str(potential_cache_dir))
     else:
         loaded_sent_transformer = SentenceTransformer(search.DEFAULT_TRANSFORMER_MODEL)
-        loaded_keybert = KeyBERT(search.DEFAULT_TRANSFORMER_MODEL)
 
     return search.get_repos(
         paper,
-        loaded_keybert=loaded_keybert,
         loaded_sent_transformer=loaded_sent_transformer,
     )

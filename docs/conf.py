@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 #
 # papers-without-code documentation build configuration file, created by
 # sphinx-quickstart on Fri Jun  9 13:47:02 2017.
@@ -26,7 +25,6 @@ import papers_without_code
 sys.path.insert(0, os.path.abspath(".."))
 
 
-
 # -- General configuration ---------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
@@ -45,7 +43,7 @@ extensions = [
     "sphinx_copybutton",
     # Doc installs
     "m2r2",
-    "numpydoc", 
+    "numpydoc",
 ]
 
 copybutton_prompt_text = r">>> |\.\.\. |\$ |In \[\d*\]: | {2,5}\.\.\.: | {5,8}: "
@@ -75,7 +73,7 @@ main_doc = "index"
 
 # General information about the project.
 project = "papers-without-code"
-copyright = "2022"
+copyright = "2022"  # noqa: A001
 author = "Eva Maxfield Brown"
 
 # The version info for the project you"re documenting, acts as replacement
@@ -117,7 +115,7 @@ html_theme = "furo"
 # theme further.  For a list of options available for each theme, see the
 # documentation.
 #
-html_theme_options = {}
+# html_theme_options = {}
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -133,20 +131,20 @@ htmlhelp_basename = "papers_without_codedoc"
 
 # -- Options for LaTeX output ------------------------------------------
 
-latex_elements = {
-    # The paper size ("letterpaper" or "a4paper").
-    #
-    # "papersize": "letterpaper",
-    # The font size ("10pt", "11pt" or "12pt").
-    #
-    # "pointsize": "10pt",
-    # Additional stuff for the LaTeX preamble.
-    #
-    # "preamble": "",
-    # Latex figure (float) alignment
-    #
-    # "figure_align": "htbp",
-}
+# latex_elements = {
+#     # The paper size ("letterpaper" or "a4paper").
+#     #
+#     # "papersize": "letterpaper",
+#     # The font size ("10pt", "11pt" or "12pt").
+#     #
+#     # "pointsize": "10pt",
+#     # Additional stuff for the LaTeX preamble.
+#     #
+#     # "preamble": "",
+#     # Latex figure (float) alignment
+#     #
+#     # "figure_align": "htbp",
+# }
 
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass
@@ -166,7 +164,9 @@ latex_documents = [
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [(main_doc, "papers_without_code", "papers-without-code Documentation", [author], 1)]
+man_pages = [
+    (main_doc, "papers_without_code", "papers-without-code Documentation", [author], 1)
+]
 
 
 # -- Options for Texinfo output ----------------------------------------
@@ -181,6 +181,9 @@ texinfo_documents = [
         "papers-without-code Documentation",
         author,
         "papers_without_code",
-        "A package (and website) to automatically attempt to find the code associated with a paper.",
+        (
+            "A package (and website) to automatically attempt "
+            "to find the code associated with a paper."
+        ),
     ),
 ]

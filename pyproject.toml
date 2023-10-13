@@ -24,18 +24,21 @@ classifiers = [
   "Programming Language :: Python :: 3.8",
   "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
 ]
 dynamic = ["version"]
 dependencies = [
-  "backoff~=2.2",
-  "beautifulsoup4~=4.11",
-  "dataclasses-json~=0.5",
-  "flask~=2.2",
-  "ghapi~=1.0",
-  "keybert~=0.7",
-  "python-dotenv~=0.21.0",
-  "requests~=2.28",
-  "sentence-transformers~=2.2",
+  "backoff>=2",
+  "beautifulsoup4>=4",
+  "dataclasses-json>=0.5",
+  "flask>=2",
+  "ghapi>=1",
+  "langchain>=0.0.313",
+  "openai>=0.28",
+  "pydantic>=2",
+  "python-dotenv>=1,<2",
+  "requests>=2",
+  "sentence-transformers>=2",
 ]
 
 [project.urls]
@@ -48,24 +51,14 @@ Documentation = "https://evamaxfield.github.io/papers-without-code"
 # https://peps.python.org/pep-0621/#dependencies-optional-dependencies
 [project.optional-dependencies]
 grobid = [
-  "docker~=6.0",
+  "docker>=6",
   "grobid-client-python==0.0.4",
-  "pandas~=1.0",
-  "xmltodict~=0.13",
+  "pandas",
+  "xmltodict>=0.13",
 ]
 lint = [
-  "black>=22.3.0",
   "check-manifest>=0.48",
-  "ruff>=0.0.216",
-  "mypy>=0.790",
   "pre-commit>=2.20.0",
-  "types-requests~=2.28",
-]
-test = [
-  "coverage>=5.1",
-  "pytest>=5.4.3",
-  "pytest-cov>=2.9.0",
-  "pytest-raises>=0.11",
 ]
 docs = [
   # Sphinx + Doc Gen + Styling
@@ -112,7 +105,7 @@ line-length = 88
 # https://github.com/charliermarsh/ruff
 [tool.ruff]
 line-length = 88
-target-version = "py38"
+target-version = "py311"
 extend-select = [
     "E",      # style errors
     "F",      # flakes
