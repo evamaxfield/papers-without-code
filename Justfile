@@ -172,6 +172,5 @@ deploy project=default_project region=default_region:
 		--region {{region}} \
 		--allow-unauthenticated \
 		--memory 4Gi \
-		--update-env-vars=[ \
-			GITHUB_TOKEN={{env_var("GITHUB_TOKEN")}}, \
-			OPENAI_API_KEY={{env_var("OPENAI_API_KEY")}}]
+		--update-env-vars GITHUB_TOKEN={{env_var("GITHUB_TOKEN")}} \
+		--update-env-vars OPENAI_API_KEY={{env_var("OPENAI_API_KEY")}}
