@@ -58,7 +58,7 @@ jobs:
     - uses: extractions/setup-just@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    - uses: google-github-actions/auth@v1
+    - uses: google-github-actions/auth@v2
       with:
         credentials_json: ${{ secrets.GOOGLE_CREDENTIALS }}
     - name: Set up Cloud SDK
